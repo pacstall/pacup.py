@@ -1,0 +1,98 @@
+ci:
+  skip: [
+    fish_syntax,
+    fish_indent,
+    codespell,
+    black,
+    isort,
+    pyupgrade,
+    mypy
+  ]
+
+repos:
+  # General
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-ast
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+      - id: trailing-whitespace
+  # Fish
+  - repo: local
+    hooks:
+      - id: fish_syntax
+        name: Fish syntax check
+        description: Check Fish shell syntax
+        language: system
+        entry: fish --no-execute
+        types: [fish]
+      - id: fish_indent
+        name: Fish indent check
+        description: Check Fish shell indentation
+        language: system
+        entry: fish_indent --write
+        types: [fish]
+  # Misc
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.1.10
+    hooks:
+      - id: insert-license
+        args: [
+          "--license-filepath=LICENSE_BOILERPLATE",
+          "--detect-license-in-X-top-lines=20"
+        ]
+        exclude: '^(.github|.git)'
+  # Python
+  - repo: local
+    hooks:
+      - id: codespell
+        name: Check for misspellings
+        description: Checks for common misspellings in text files
+        args: [
+          --check-hidden,
+          --check-filenames,
+          --builtin,
+          clear,
+          rare,
+          informal,
+          usage,
+          code
+        ]
+        language: system
+        entry: poetry run codespell
+        types: [text]
+      - id: black
+        name: Format python code
+        description: Automatically format code to follow the black code style
+        language: system
+        entry: poetry run black
+        types_or: [python, pyi]
+        require_serial: true
+      - id: isort
+        name: Sort python imports
+        description: Automatically sort import statements
+        language: system
+        entry: poetry run isort
+        types_or: [cython, pyi, python]
+        require_serial: true
+      - id: pyupgrade
+        name: Check for old python syntax
+        description: Automatically upgrade syntax for newer versions
+        args: [--py36-plus]
+        language: system
+        entry: poetry run pyupgrade
+        types: [python]
+      - id: mypy
+        name: Type check python code
+        description: Static type checker for Python
+        language: system
+        entry: poetry run mypy
+        types_or: [python, pyi]
+        require_serial: true
+# vim:set ft=yaml ts=2 sw=2 et:
