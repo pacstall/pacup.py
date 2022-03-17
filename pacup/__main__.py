@@ -168,12 +168,12 @@ def validate_parameters(pacscripts: List[Path]) -> List[Path]:
     # Check if all the pacscript paths have `.pacscript` prefix
     # Signifying that they are pacscript files.
     if not all(map(lambda pacscript: pacscript.suffix == ".pacscript", pacscripts)):
-        raise typer.BadParameter(f"All pacscripts must have a .pacscript extension.")
+        raise typer.BadParameter("All pacscripts must have a .pacscript extension.")
 
     # Error out if any of the pacscripts are `-git` pacscripts
     # Not eligible for pacup
     if any(map(lambda pacscript: pacscript.stem.endswith("-git"), pacscripts)):
-        raise typer.BadParameter(f"Git pacscripts are not supported.")
+        raise typer.BadParameter("Git pacscripts are not supported.")
 
     return pacscripts
 
@@ -519,7 +519,7 @@ def update(
         # Install the new pacscript with pacstall
         log.info("Installing pacscript...")
 
-        rprint(f"   [bold blue]=>[/bold blue] Installing pacscript using pacstall")
+        rprint("   [bold blue]=>[/bold blue] Installing pacscript using pacstall")
         rprint(f"[bold blue]{'─' * get_terminal_size().columns}[/bold blue]")
 
         try:
