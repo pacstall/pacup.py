@@ -1,7 +1,5 @@
 ci:
   skip: [
-    fish_syntax,
-    fish_indent,
     codespell,
     black,
     isort,
@@ -23,21 +21,6 @@ repos:
       - id: mixed-line-ending
         args: ["--fix=lf"]
       - id: trailing-whitespace
-  # Fish
-  - repo: local
-    hooks:
-      - id: fish_syntax
-        name: Fish syntax check
-        description: Check Fish shell syntax
-        language: system
-        entry: fish --no-execute
-        types: [fish]
-      - id: fish_indent
-        name: Fish indent check
-        description: Check Fish shell indentation
-        language: system
-        entry: fish_indent --write
-        types: [fish]
   # Misc
   - repo: https://github.com/Lucas-C/pre-commit-hooks
     rev: v1.1.13
