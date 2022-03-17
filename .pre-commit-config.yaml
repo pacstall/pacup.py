@@ -31,6 +31,7 @@ repos:
           "--detect-license-in-X-top-lines=20"
         ]
         exclude: '^(.github|.git)'
+        types: [text]
   # Python
   - repo: local
     hooks:
