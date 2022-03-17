@@ -24,7 +24,6 @@
 # You should have received a copy of the GNU General Public License
 # along with PacUp.  If not, see <https://www.gnu.org/licenses/>.
 
-from __future__ import annotations
 
 import hashlib
 import subprocess
@@ -37,7 +36,7 @@ from logging import basicConfig, getLogger
 from os import get_terminal_size, makedirs
 from pathlib import Path
 from shutil import rmtree
-from typing import Generator, NoReturn
+from typing import Dict, Generator, List, NoReturn, Optional
 
 import typer
 from httpx import AsyncClient, HTTPStatusError, RequestError
@@ -108,11 +107,11 @@ async def download(url: str, progress: Progress, task: TaskID) -> str:
 
 
 async def get_parsed_pacscripts(
-    pacscripts: list[Path],
+    pacscripts: List[Path],
     task: TaskID,
     progress: Progress,
-    show_filters: bool | None,
-) -> list[Pacscript]:
+    show_filters: Optional[bool],
+) -> List[Pacscript]:
     """
     Get the parsed pacscripts from a list of pacscript paths.
 
@@ -151,7 +150,7 @@ async def get_parsed_pacscripts(
         )
 
 
-def validate_parameters(pacscripts: list[Path]) -> list[Path]:
+def validate_parameters(pacscripts: List[Path]) -> List[Path]:
     """
     Validate command parameters.
 
@@ -220,19 +219,19 @@ def version_callback(value: bool) -> None:
 
 @app.command()
 def update(
-    show_filters: bool
-    | None = typer.Option(
+    show_filters: Optional[bool] = typer.Option(
         None,
         "-s",
         "--show-filters",
         help="Shows the parsed repology filters and filterate",
     ),
-    debug: bool
-    | None = typer.Option(None, "-d", "--debug", help="Turn on debugging mode"),
-    verbose: bool
-    | None = typer.Option(None, "-v", "--verbose", help="Turn on verbose mode"),
-    version_option: bool
-    | None = typer.Option(
+    debug: Optional[bool] = typer.Option(
+        None, "-d", "--debug", help="Turn on debugging mode"
+    ),
+    verbose: Optional[bool] = typer.Option(
+        None, "-v", "--verbose", help="Turn on verbose mode"
+    ),
+    version_option: Optional[bool] = typer.Option(
         None,
         "-V",
         "--version",
@@ -240,7 +239,7 @@ def update(
         callback=version_callback,
         is_eager=True,
     ),
-    pacscripts: list[Path] = typer.Argument(
+    pacscripts: List[Path] = typer.Argument(
         ...,
         help="The pacscripts to update.",
         exists=True,
@@ -273,7 +272,7 @@ def update(
             "Parsing pacscripts", total=len(pacscripts)
         )
         loop = get_event_loop()
-        parsed_pacscripts: list[Pacscript] = loop.run_until_complete(
+        parsed_pacscripts: List[Pacscript] = loop.run_until_complete(
             get_parsed_pacscripts(
                 pacscripts, task, parsing_pacscripts_progress, show_filters
             )
@@ -286,10 +285,10 @@ def update(
     version_statuses_table = Table.grid()
     version_statuses_table.add_column()
 
-    outdated_pacscripts: list[Pacscript] = []
-    updated_pacscripts: list[Pacscript] = []
-    newer_pacscripts: list[Pacscript] = []
-    unknown_pacscripts: list[Pacscript] = []
+    outdated_pacscripts: List[Pacscript] = []
+    updated_pacscripts: List[Pacscript] = []
+    newer_pacscripts: List[Pacscript] = []
+    unknown_pacscripts: List[Pacscript] = []
     for pacscript in parsed_pacscripts:
         if pacscript.version.status == VersionStatuses.OUTDATED:
             outdated_pacscripts.append(pacscript)
@@ -403,8 +402,8 @@ def update(
 
     # Loop through the parsed pacscripts and update them
     log.info("Updating pacscripts...")
-    successfully_updated_pacscripts: list[Pacscript] = []
-    failed_to_update_pacscripts: dict[Pacscript, str] = {}
+    successfully_updated_pacscripts: List[Pacscript] = []
+    failed_to_update_pacscripts: Dict[Pacscript, str] = {}
     for pacscript in outdated_pacscripts:
         path = pacscript.path
         pkgname = pacscript.pkgname

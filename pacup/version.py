@@ -22,12 +22,11 @@
 # You should have received a copy of the GNU General Public License
 # along with PacUp.  If not, see <https://www.gnu.org/licenses/>.
 
-from __future__ import annotations
 
 from asyncio.locks import Semaphore
 from enum import Enum, auto
 from logging import getLogger
-from typing import Any, Literal
+from typing import Any, Dict, List, Literal, Optional, Union
 
 from httpx import AsyncClient, HTTPStatusError, RequestError
 from packaging import version as pkg_version
@@ -66,18 +65,20 @@ class Version:
 
     @staticmethod
     async def get_latest_version(
-        filters: dict[str, str],
+        filters: Dict[str, str],
         client: AsyncClient,
         semaphore: Semaphore,
-        show_filters: bool | None,
+        show_filters: Optional[bool],
     ) -> (
-        str
-        | Literal[
-            RepologyErrors.NOT_FOUND,
-            RepologyErrors.NO_PROJECT_FILTER,
-            RepologyErrors.NO_FILTERS,
-            RepologyErrors.HTTP_STATUS_ERROR,
-            RepologyErrors.REQUEST_ERROR,
+        Union[
+            str,
+            Literal[
+                RepologyErrors.NOT_FOUND,
+                RepologyErrors.NO_PROJECT_FILTER,
+                RepologyErrors.NO_FILTERS,
+                RepologyErrors.HTTP_STATUS_ERROR,
+                RepologyErrors.REQUEST_ERROR,
+            ],
         ]
     ):
         """
@@ -96,14 +97,7 @@ class Version:
 
         Returns
         -------
-        str
-        | Literal[
-            RepologyErrors.NOT_FOUND,
-            RepologyErrors.NO_PROJECT_FILTER,
-            RepologyErrors.NO_FILTERS,
-            RepologyErrors.HTTP_STATUS_ERROR,
-            RepologyErrors.REQUEST_ERROR,
-        ]
+        Union[str, Literal[RepologyErrors.NOT_FOUND, RepologyErrors.NO_PROJECT_FILTER, RepologyErrors.NO_FILTERS, RepologyErrors.HTTP_STATUS_ERROR, RepologyErrors.REQUEST_ERROR]]
             The latest version of the package.
         """
         async with semaphore:
@@ -142,11 +136,11 @@ class Version:
                 return RepologyErrors.HTTP_STATUS_ERROR
 
             else:
-                filtered: list[dict[str, Any]] = response.json()
+                filtered: List[Dict[str, Any]] = response.json()
 
                 log.info("Filtering...")
                 for key, value in filters.items():
-                    new_filtered: list[dict[str, Any]] = []
+                    new_filtered: List[Dict[str, Any]] = []
                     for packages in filtered:
                         if packages[key] == value:
                             new_filtered.append(packages)

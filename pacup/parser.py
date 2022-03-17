@@ -22,12 +22,12 @@
 # You should have received a copy of the GNU General Public License
 # along with PacUp.  If not, see <https://www.gnu.org/licenses/>.
 
-from __future__ import annotations
 
 from asyncio.locks import Semaphore
 from asyncio.subprocess import PIPE, Process, create_subprocess_shell
 from logging import getLogger
 from pathlib import Path
+from typing import Dict, List, Optional
 
 from httpx import AsyncClient, HTTPStatusError, RequestError
 from rich.progress import Progress, TaskID
@@ -106,9 +106,9 @@ class Pacscript:
         url: Url,
         hash_line: int,
         maintainer: str,
-        repology_filters: dict[str, str],
-        release_notes: dict[str, str],
-        lines: list[str],
+        repology_filters: Dict[str, str],
+        release_notes: Dict[str, str],
+        lines: List[str],
     ):
         """
         Parameters
@@ -151,8 +151,8 @@ class Pacscript:
         semaphore: Semaphore,
         task: TaskID,
         progress: Progress,
-        show_filters: bool | None,
-    ) -> Pacscript:
+        show_filters: Optional[bool],
+    ) -> "Pacscript":
         """
         Parses a pacscript file.
 
@@ -189,7 +189,7 @@ class Pacscript:
         url = Url()
         hash_line = -1  # Which line contains the hash
         maintainer = ""
-        repology_filters: dict[str, str] = {}
+        repology_filters: Dict[str, str] = {}
 
         pacscript_reader_process = await create_subprocess_shell(
             "/bin/bash", stdin=PIPE, stdout=PIPE
@@ -269,7 +269,7 @@ class Pacscript:
         )
 
         # Fetch the release notes
-        release_notes: dict[str, str] = {}
+        release_notes: Dict[str, str] = {}
         try:
             owner = url.value.split("/")[3]
             repo = url.value.split("/")[4]
