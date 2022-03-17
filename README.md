@@ -29,11 +29,11 @@ Arguments:
   PACSCRIPTS...  The pacscripts to update.  [required]
 
 Options:
-  -s, --show-filters              Shows the parsed repology filters and
-                                  filterate
-  -d, --debug                     Turn on debugging mode
-  -v, --verbose                   Turn on verbose mode
-  -V, --version                   Show the version and exit
+  -s, --show-filters              Show the parsed repology filters and
+                                  filterate.
+  -d, --debug                     Turn on debugging mode.
+  -v, --verbose                   Turn on verbose mode.
+  -V, --version                   Show the version and exit.
   --install-completion [bash|zsh|fish|powershell|pwsh]
                                   Install completion for the specified shell.
   --show-completion [bash|zsh|fish|powershell|pwsh]

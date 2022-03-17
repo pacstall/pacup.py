@@ -223,19 +223,19 @@ def update(
         None,
         "-s",
         "--show-filters",
-        help="Shows the parsed repology filters and filterate",
+        help="Show the parsed repology filters and filterate.",
     ),
     debug: Optional[bool] = typer.Option(
-        None, "-d", "--debug", help="Turn on debugging mode"
+        None, "-d", "--debug", help="Turn on debugging mode."
     ),
     verbose: Optional[bool] = typer.Option(
-        None, "-v", "--verbose", help="Turn on verbose mode"
+        None, "-v", "--verbose", help="Turn on verbose mode."
     ),
     version_option: Optional[bool] = typer.Option(
         None,
         "-V",
         "--version",
-        help="Show the version and exit",
+        help="Show the version and exit.",
         callback=version_callback,
         is_eager=True,
     ),
