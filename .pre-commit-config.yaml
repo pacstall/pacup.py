@@ -84,7 +84,7 @@ repos:
       - id: pyupgrade
         name: Check for old python syntax
         description: Automatically upgrade syntax for newer versions
-        args: [--py36-plus]
+        args: [--py38-plus]
         language: system
         entry: poetry run pyupgrade
         types: [python]
