@@ -86,7 +86,7 @@ async def download(url: str, progress: Progress, task: TaskID) -> str:
         The path to the downloaded package.
     """
 
-    hash = hashlib.sha256()
+    download_hash = hashlib.sha256()
 
     async with AsyncClient(follow_redirects=True).stream("GET", url) as response:
         response.raise_for_status()
@@ -100,10 +100,10 @@ async def download(url: str, progress: Progress, task: TaskID) -> str:
                 if chunk:
                     file.write(chunk)
                     progress.update(task, advance=len(chunk))
-                    hash.update(chunk)
+                    download_hash.update(chunk)
 
         # NOTE: Hash calculation is only done here at the end
-        return hash.hexdigest()
+        return download_hash.hexdigest()
 
 
 async def get_parsed_pacscripts(
