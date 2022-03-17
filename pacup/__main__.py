@@ -303,7 +303,7 @@ def update(
         f"oudated pacscripts = {[pacscript.path.stem for pacscript in outdated_pacscripts]}"
     )
     log.debug(
-        f"updated pacscripts = {[pacscript.path.stem for pacscript in updated_pacscripts]}"
+        f"up-to-date pacscripts = {[pacscript.path.stem for pacscript in updated_pacscripts]}"
     )
     log.debug(
         f"newer pacscripts = {[pacscript.path.stem for pacscript in newer_pacscripts]}"
@@ -334,20 +334,24 @@ def update(
         )
 
     if len(updated_pacscripts) > 0:
-        log.info("Adding updated pacscripts to version statuses...")
-        updated_pacscripts_table = Table(box=None, expand=True)
-        updated_pacscripts_table.add_column("Pacscript", justify="center")
-        updated_pacscripts_table.add_column("Maintainer", justify="center")
+        log.info("Adding up-to-date pacscripts to version statuses...")
+        up_to_date_pacscripts_table = Table(box=None, expand=True)
+        up_to_date_pacscripts_table.add_column("Pacscript", justify="center")
+        up_to_date_pacscripts_table.add_column("Maintainer", justify="center")
 
         for updated_pacscript in updated_pacscripts:
-            updated_pacscripts_table.add_row(
+            up_to_date_pacscripts_table.add_row(
                 updated_pacscript.path.stem,
                 updated_pacscript.maintainer,
                 style="green",
             )
 
         version_statuses_table.add_row(
-            Panel(updated_pacscripts_table, title="Updated", border_style="bold green")
+            Panel(
+                up_to_date_pacscripts_table,
+                title="Up To Date",
+                border_style="bold green",
+            )
         )
 
     if len(newer_pacscripts) > 0:
