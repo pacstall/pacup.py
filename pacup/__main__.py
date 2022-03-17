@@ -251,7 +251,7 @@ def update(
 ) -> NoReturn:
     """Updates specified pacscripts."""
 
-    basicConfig(level="WARNING", format="%(message)s", handlers=[RichHandler()])
+    basicConfig(level="CRITICAL", format="%(message)s", handlers=[RichHandler()])
     log = getLogger("rich")
 
     if debug:

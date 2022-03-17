@@ -257,12 +257,14 @@ class Pacscript:
                     'for property in "${repology[@]}"; do echo "${property}"; done',
                 )
 
-                repology_filters = {}
-                for repology_filter in repology_output.splitlines():
-                    filter_key, filter_value = repology_filter.split(": ")
-                    repology_filters[filter_key] = filter_value
-
-                log.debug(f"{repology_filters = }")
+                try:
+                    for repology_filter in repology_output.splitlines():
+                        filter_key, filter_value = repology_filter.split(": ")
+                        repology_filters[filter_key] = filter_value
+                except ValueError:
+                    log.error(f"Failed to parse repology filters for {path.stem}.")
+                else:
+                    log.debug(f"{repology_filters = }")
 
         version.latest = await Version.get_latest_version(
             repology_filters, client, semaphore, show_filters
