@@ -221,9 +221,9 @@ def version_callback(value: bool) -> None:
 def update(
     show_filters: Optional[bool] = typer.Option(
         None,
-        "-s",
-        "--show-filters",
-        help="Show the parsed repology filters and filterate.",
+        "-r",
+        "--show-repology",
+        help="Show the parsed repology data.",
     ),
     debug: Optional[bool] = typer.Option(
         None, "-d", "--debug", help="Turn on debugging mode."
