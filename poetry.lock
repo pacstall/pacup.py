@@ -274,7 +274,7 @@ python-versions = "*"
 name = "packaging"
 version = "21.3"
 description = "Core utilities for Python packages"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -349,7 +349,7 @@ python-versions = ">=3.5"
 name = "pyparsing"
 version = "3.0.7"
 description = "Python parsing module"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -511,7 +511,7 @@ testing = ["coverage (>=4)", "coverage-enable-subprocess (>=1)", "flaky (>=3)", 
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "d5661362e02c6242c96b61b731867e5c7d8fec093d2ba3aa2fcf9642541e757a"
+content-hash = "5f9115f9b7665340aadb05cbd68985f498bfb5d25ab74b868d50c7fe763dfdb1"
 
 [metadata.files]
 anyio = [
