@@ -282,6 +282,7 @@ class Pacscript:
             # Get each versions release notes between current and latest
             release_notes_apis = {
                 "github": f"https://api.github.com/repos/{owner}/{repo}/releases",
+                # BUG: GitLab doesn't work
                 "gitlab": f"https://{url.value.split('/')[2]}/api/v4/projects/{owner}%2F{repo}/releases",
                 "bitbucket": f"https://api.bitbucket.org/2.0/repositories/{owner}/{repo}/releases",
             }
