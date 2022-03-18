@@ -26,7 +26,7 @@
 from asyncio.locks import Semaphore
 from enum import Enum, auto
 from logging import getLogger
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Any, Counter, Dict, List, Literal, Optional, Union
 
 from httpx import AsyncClient, HTTPStatusError, RequestError
 from packaging import version as pkg_version
@@ -147,8 +147,20 @@ class Version:
                     if new_filtered:
                         filtered = new_filtered
 
+                # Map the versions to their list of packages
+                log.info("Mapping the versions to their filtered packages...")
+                versions: List[str] = []
+
+                for package in filtered:
+                    versions.append(package["version"])
+
                 log.debug(f"{filtered = }")
-                log.debug(f"{filtered[0] = }")
+                log.debug(f"{versions = }")
+
+                log.info("Selecting most common version...")
+                selected_version = Counter(versions).most_common(1)[0][0]
+                log.debug(f"{selected_version = }")
+
                 if show_filters:
                     repology_table.add_row(
                         Panel(
@@ -159,18 +171,16 @@ class Version:
                     )
                     repology_table.add_row(
                         Panel(
-                            Pretty(filtered[0], indent_guides=True),
-                            title="Package selected",
-                            border_style="bold blue",
+                            selected_version,
+                            title="Selected version (most common)",
+                            style="bold blue",
                         )
                     )
 
                     rprint(Panel.fit(repology_table, title=f"Repology for {project}"))
 
-                version: str = filtered[0]["version"]
-                return version
-
-                return RepologyErrors.NOT_FOUND
+                # Return the most common version
+                return selected_version
 
     @property
     def status(
@@ -196,4 +206,4 @@ class Version:
         return VersionStatuses.NEWER
 
     def __repr__(self) -> str:
-        return f"Version(line_number={self.line_number}, current={self.current}, latest={self.latest if isinstance(self.latest, int) else f'{self.latest}'}, status={self.status})"
+        return f"Version(line_number={self.line_number}, current={self.current}, latest={self.latest}, status={self.status})"

@@ -64,8 +64,8 @@ On running `pacup foo.pacscript` Pacup will parse the pacscript's variables,
 then it compiles a list of filters specified in the `repology` variable in the
 pacscript. Then it queries the [Repology API](https://repology.org/api) to get
 all the repositories which have packaged that package. After which it applies
-the filter to the response, and from the filterate it considers the **first**
-repository's package's version to be the latest.
+the filter to the response, and from the filterate it considers the most common
+version to be the latest.
 
 Then it replaces all occurrences of the previous `version`'s value in the `url`
 with the latest one placeholder's value with the latest version, and downloads
