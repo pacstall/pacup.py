@@ -124,7 +124,6 @@ class Version:
                             border_style="bold blue",
                         )
                     )
-                    rprint(filters)
                 if "status" not in filters:
                     filters["status"] = "newest"
 
