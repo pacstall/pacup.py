@@ -309,6 +309,7 @@ class Pacscript:
                             == version.current
                         ):
                             current_release_index = index
+                            break
                 elif "gitlab" in url.value:
                     for index, releases in enumerate(json()):
                         if (
@@ -316,6 +317,7 @@ class Pacscript:
                             == version.current
                         ):
                             current_release_index = index
+                            break
                 elif "bitbucket" in url.value:
                     for index, releases in enumerate(json()):
                         if (
@@ -323,6 +325,7 @@ class Pacscript:
                             == version.current
                         ):
                             current_release_index = index
+                            break
 
                 log.debug(f"{current_release_index = }")
 
