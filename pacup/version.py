@@ -141,7 +141,7 @@ class Version:
                 for key, value in filters.items():
                     new_filtered: List[Dict[str, Any]] = []
                     for packages in filtered:
-                        if packages[key] == value:
+                        if key in packages and packages[key] == value:
                             new_filtered.append(packages)
                     if new_filtered:
                         filtered = new_filtered
