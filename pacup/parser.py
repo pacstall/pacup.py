@@ -32,6 +32,7 @@ from typing import Dict, List, Optional
 from httpx import AsyncClient, HTTPStatusError, RequestError
 from rich.progress import Progress, TaskID
 
+from pacup.release_notes import Github, Gitlab
 from pacup.version import Version
 
 log = getLogger("rich")
@@ -271,81 +272,20 @@ class Pacscript:
         )
 
         # Fetch the release notes
-        release_notes: Dict[str, str] = {}
+        release_notes = {}
         try:
-            owner = url.value.split("/")[3]
-            repo = url.value.split("/")[4]
+            if "github" in url.value:
+                release_notes = await Github(
+                    version.current, url.value, client
+                ).release_notes
 
-            log.debug(f"{owner = }")
-            log.debug(f"{repo = }")
+            elif "gitlab" in url.value:
+                release_notes = await Gitlab(
+                    version.current, url.value, client
+                ).release_notes
 
-            # Get each versions release notes between current and latest
-            release_notes_apis = {
-                "github": f"https://api.github.com/repos/{owner}/{repo}/releases",
-                # BUG: GitLab doesn't work
-                "gitlab": f"https://{url.value.split('/')[2]}/api/v4/projects/{owner}%2F{repo}/releases",
-                "bitbucket": f"https://api.bitbucket.org/2.0/repositories/{owner}/{repo}/releases",
-            }
-
-            release_note_api = release_notes_apis[url.value.split("/")[2].split(".")[0]]
-
-            log.info(f"release_note_api = {release_note_api}")
-
-        except (IndexError, KeyError):
-            release_notes = {}
-        else:
-            try:
-                response = await client.get(release_note_api)
-                response.raise_for_status()
-            except (HTTPStatusError, RequestError):
-                release_notes = {}
-            else:
-                json = response.json()
-                # Find out how many releases there are between current and latest
-                current_release_index = 0
-                if "github" in url.value:
-                    for index, releases in enumerate(json):
-                        if (
-                            releases["tag_name"].capitalize().replace("V", "")
-                            == version.current
-                        ):
-                            current_release_index = index
-                            break
-                elif "gitlab" in url.value:
-                    for index, releases in enumerate(json()):
-                        if (
-                            releases["tag_name"].capitalize().replace("V", "")
-                            == version.current
-                        ):
-                            current_release_index = index
-                            break
-                elif "bitbucket" in url.value:
-                    for index, releases in enumerate(json()):
-                        if (
-                            releases["name"].capitalize().replace("V", "")
-                            == version.current
-                        ):
-                            current_release_index = index
-                            break
-
-                log.debug(f"{current_release_index = }")
-
-                for index, release_note in enumerate(json):
-                    if current_release_index == index:
-                        break
-                    if "github" in url.value:
-                        if release_note["tag_name"]:
-                            release_notes[release_note["tag_name"]] = release_note[
-                                "body"
-                            ]
-                    elif "gitlab" in url.value:
-                        release_notes[release_note["tag_name"]] = release_note[
-                            "description"
-                        ]
-                    elif "bitbucket" in url.value:
-                        release_notes[release_note["name"]] = release_note[
-                            "description"
-                        ]
+        except (HTTPStatusError, RequestError):
+            pass
 
         pacscript_reader_process.stdin.close()
         await pacscript_reader_process.wait()
