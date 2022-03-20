@@ -1,0 +1,61 @@
+name: Bug Report
+description: File a bug report
+title: "[Bug]: "
+labels: ["bug", "triage"]
+assignees:
+  - wizard-28
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      placeholder: Tell us what you see!
+    validations:
+      required: true
+  - type: textarea
+    id: expectation
+    attributes:
+      label: What do you expect to happen?
+    validations:
+          required: true
+  - type: textarea
+    id: pacscripts
+    attributes:
+      label: Which pacscripts are affected?
+      description: List them!
+      placeholder: |
+        1. [foo](link to foo.pacscript)
+        2. [bar](link to bar.pacscript)
+    validations:
+          required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Tell us how to reproduce this bug
+      placeholder: |
+        1. Run `pacup foo.pacscript`.
+        2. Something goes wrong.
+    validations:
+      required: true
+  - type: dropdown
+    id: version
+    attributes:
+      label: Version
+      description: Which versions are affected?
+      multiple: true
+      options:
+      - Latest Release
+      - Development Build
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: Please run the command with `-d` flag, and paste the output here.
+      render: python
