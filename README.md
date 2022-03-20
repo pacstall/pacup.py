@@ -1,9 +1,10 @@
 <p align="center"><img alt="logo" src="https://raw.githubusercontent.com/pacstall/pacup/master/imgs/logo.png"></p>
 <h1 align="center">Pacup</h1>
 <p align="center">
-  <a href="https://www.python.org/"><img alt="python 3.8+" src="https://img.shields.io/badge/python-3.8%2B-306998?logo=python&logoColor=white&style=for-the-badge"></a>
-  <a href="https://github.com/psf/black"><img alt="code style: 3.8+" src="https://img.shields.io/badge/code%20style-black-black?style=for-the-badge"/></a>
-  <a href="https://www.codacy.com/gh/pacstall/pacup/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=pacstall/pacup&amp;utm_campaign=Badge_Grade"><img alt="Codacy grade" src="https://img.shields.io/codacy/grade/4b1365e6f7d2474283243f62b2c5973d?label=Codacy&logo=codacy&style=for-the-badge"></a>
+  <a href="https://www.python.org/"><img alt="Python: 3.8+" src="https://img.shields.io/badge/python-3.8%2B-306998?logo=python&logoColor=white&style=for-the-badge"></a>
+  <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-black?style=for-the-badge"/></a>
+  <a href="https://www.codacy.com/gh/pacstall/pacup/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=pacstall/pacup&amp;utm_campaign=Badge_Grade"><img alt="Codacy: grade" src="https://img.shields.io/codacy/grade/4b1365e6f7d2474283243f62b2c5973d?label=Codacy&logo=codacy&style=for-the-badge"></a>
+  <a href="https://pypi.org/project/pacup/"><img alt="PyPI: version" src="https://img.shields.io/pypi/v/pacup?color=%233775a9&logo=pypi&logoColor=white&style=for-the-badge"></a>
 <p/>
 <p align="center">
   <!-- Social -->
