@@ -21,10 +21,13 @@ updating pacscripts, and aims to make it a fun process for the maintainer!
 
 ## Installation
 
-We have plans to make standalone executable binaries, making a pacscript and
-publishing to PyPI after the first release of Pacup.
+To install the latest release run:
 
-For now you can install it directly from the repository.
+```bash
+$ pip install pacup
+```
+
+To install the latest development build run:
 
 ```bash
 $ pip install git+https://github.com/pacstall/pacup
