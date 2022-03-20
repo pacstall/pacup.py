@@ -32,7 +32,7 @@ $ pip install git+https://github.com/pacstall/pacup
 
 ## Usage
 
-```
+```monospace
 Usage: pacup [OPTIONS] PACSCRIPTS...
 
   Updates specified pacscripts.
@@ -41,8 +41,7 @@ Arguments:
   PACSCRIPTS...  The pacscripts to update.  [required]
 
 Options:
-  -s, --show-filters              Show the parsed repology filters and
-                                  filterate.
+  -r, --show-repology             Show the parsed repology data.
   -d, --debug                     Turn on debugging mode.
   -v, --verbose                   Turn on verbose mode.
   -V, --version                   Show the version and exit.
