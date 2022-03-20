@@ -1,4 +1,4 @@
-<p align="center"><img alt="logo" src=imgs/logo.png/></p>
+<p align="center"><img alt="logo" src="https://raw.githubusercontent.com/pacstall/pacup/master/imgs/logo.png"></p>
 <h1 align="center">Pacup</h1>
 <p align="center">
   <a href="https://www.python.org/"><img alt="python 3.8+" src="https://img.shields.io/badge/python-3.8%2B-306998?logo=python&logoColor=white&style=for-the-badge"></a>
