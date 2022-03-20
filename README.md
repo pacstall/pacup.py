@@ -53,7 +53,7 @@ Options:
   --help                          Show this message and exit.
 ```
 
-You can get this help text by running `pacup --help`
+You can get this help text by running `pacup --help`.
 
 ## How does it work?
 
@@ -63,7 +63,7 @@ On running `pacup foo.pacscript` Pacup will parse the pacscript's variables,
 then it compiles a list of filters specified in the `repology` variable in the
 pacscript. Then it queries the [Repology API](https://repology.org/api) to get
 all the repositories which have packaged that package. After which it applies
-the filter to the response, and from the filterate it considers the most common
+the filter to the response, and from the filtrate it considers the most common
 version to be the latest.
 
 Then it replaces all occurrences of the previous `version`'s value in the `url`
@@ -106,4 +106,5 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with PacUp.  If not, see <https://www.gnu.org/licenses/>.```
+along with PacUp.  If not, see <https://www.gnu.org/licenses/>.
+```
