@@ -119,11 +119,11 @@ class Gitlab(Repository):
         if "projects" in self.url:
             # NOTE: https://gitlab.com/api/v4/projects/24386000/...
             log.info("ID type URL detected.")
-            id = self.url.split("/")[6]
-            log.debug(f"{id = }")
+            identifier = self.url.split("/")[6]
+            log.debug(f"{identifier = }")
 
             response = await self.client.get(
-                f"https://gitlab.com/api/v4/projects/{id}/releases"
+                f"https://gitlab.com/api/v4/projects/{identifier}/releases"
             )
 
         else:
