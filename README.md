@@ -90,7 +90,7 @@ is considered successfully upgraded and the program ends.
 
 ## License
 
-```
+```monospace
     ____             __  __
    / __ \____ ______/ / / /___
   / /_/ / __ `/ ___/ / / / __ \
