@@ -47,8 +47,7 @@ Arguments:
 Options:
   -r, --show-repology             Show the parsed repology data and exit.
   -d, --debug                     Turn on debugging mode.
-  -v, --verbose                   Turn on verbose mode.
-  -V, --version                   Show the version and exit.
+  -v, --version                   Show the version and exit.
   --install-completion [bash|zsh|fish|powershell|pwsh]
                                   Install completion for the specified shell.
   --show-completion [bash|zsh|fish|powershell|pwsh]

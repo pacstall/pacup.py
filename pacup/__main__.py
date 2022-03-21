@@ -230,12 +230,9 @@ def update(
     debug: Optional[bool] = typer.Option(
         None, "-d", "--debug", help="Turn on debugging mode."
     ),
-    verbose: Optional[bool] = typer.Option(
-        None, "-v", "--verbose", help="Turn on verbose mode."
-    ),
-    version_option: Optional[bool] = typer.Option(
+    _: Optional[bool] = typer.Option(
         None,
-        "-V",
+        "-v",
         "--version",
         help="Show the version and exit.",
         callback=version_callback,
