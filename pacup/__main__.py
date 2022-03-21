@@ -64,7 +64,7 @@ from rich.table import Table
 from pacup.parser import Pacscript
 from pacup.version import VersionStatuses
 
-__version__ = "0.1.2 Moon (dev)"
+__version__ = "0.1.2 Thyone (dev)"
 
 app = typer.Typer(name="pacup")
 
