@@ -68,7 +68,7 @@ class Version:
         filters: Dict[str, str],
         client: AsyncClient,
         semaphore: Semaphore,
-        show_filters: Optional[bool],
+        show_repology: Optional[bool],
     ) -> (
         Union[
             str,
@@ -92,8 +92,8 @@ class Version:
             The Async HTTP client to use.
         semaphore
             The semaphore to use.
-        show_filters
-            Whether to show the repology filter and filtrate.
+        show_repology
+            Whether to show the parsed repology data.
 
         Returns
         -------
@@ -116,7 +116,7 @@ class Version:
                 repology_table = Table.grid()
                 repology_table.add_column()
                 project = filters["project"]
-                if show_filters:
+                if show_repology:
                     repology_table.add_row(
                         Panel(
                             Pretty(filters, indent_guides=True),
@@ -160,7 +160,7 @@ class Version:
                 selected_version = Counter(versions).most_common(1)[0][0]
                 log.debug(f"{selected_version = }")
 
-                if show_filters:
+                if show_repology:
                     repology_table.add_row(
                         Panel(
                             Pretty(filtered, indent_guides=True),

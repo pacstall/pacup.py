@@ -152,7 +152,7 @@ class Pacscript:
         semaphore: Semaphore,
         task: TaskID,
         progress: Progress,
-        show_filters: Optional[bool],
+        show_repology: Optional[bool],
     ) -> "Pacscript":
         """
         Parses a pacscript file.
@@ -169,8 +169,8 @@ class Pacscript:
             The parsing task to update.
         progress
             The progress bar to use.
-        show_filters
-            Whether to show the repology filters and filtrate.
+        show_repology
+            Whether to show the parsed repology data.
 
         Returns
         -------
@@ -268,7 +268,7 @@ class Pacscript:
                     log.debug(f"{repology_filters = }")
 
         version.latest = await Version.get_latest_version(
-            repology_filters, client, semaphore, show_filters
+            repology_filters, client, semaphore, show_repology
         )
 
         # Fetch the release notes

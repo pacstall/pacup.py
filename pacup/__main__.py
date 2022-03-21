@@ -110,7 +110,7 @@ async def get_parsed_pacscripts(
     pacscripts: List[Path],
     task: TaskID,
     progress: Progress,
-    show_filters: Optional[bool],
+    show_repology: Optional[bool],
 ) -> List[Pacscript]:
     """
     Get the parsed pacscripts from a list of pacscript paths.
@@ -123,6 +123,8 @@ async def get_parsed_pacscripts(
         The task ID to update.
     progress
         The progress bar to use.
+    show_repology
+        Whether to show the parsed repology data.
 
     Returns
     -------
@@ -142,7 +144,7 @@ async def get_parsed_pacscripts(
                     semaphore,
                     task,
                     progress,
-                    show_filters,
+                    show_repology,
                 )
                 for pacscript in pacscripts
             ],
@@ -219,7 +221,7 @@ def version_callback(value: bool) -> None:
 
 @app.command()
 def update(
-    show_filters: Optional[bool] = typer.Option(
+    show_repology: Optional[bool] = typer.Option(
         None,
         "-r",
         "--show-repology",
@@ -274,7 +276,7 @@ def update(
         loop = get_event_loop()
         parsed_pacscripts: List[Pacscript] = loop.run_until_complete(
             get_parsed_pacscripts(
-                pacscripts, task, parsing_pacscripts_progress, show_filters
+                pacscripts, task, parsing_pacscripts_progress, show_repology
             )
         )
         log.debug(f"{parsed_pacscripts = }")
