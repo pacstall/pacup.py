@@ -59,6 +59,9 @@ Options:
 
 You can get this help text by running `pacup --help`.
 
+You should visit our [wiki](https://github.com/pacstall/pacup/wiki/Wiki), for
+more information on how to use the `repology` key.
+
 ## How does it work?
 
 Suppose `foo.pacscript` is outdated.
