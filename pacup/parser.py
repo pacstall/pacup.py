@@ -22,6 +22,8 @@
 # You should have received a copy of the GNU General Public License
 # along with PacUp.  If not, see <https://www.gnu.org/licenses/>.
 
+""" The pacscript parser module."""
+
 
 from asyncio.locks import Semaphore
 from asyncio.subprocess import PIPE, Process, create_subprocess_shell
@@ -87,6 +89,17 @@ async def query_data(pacscript_reader_process: Process, query_command: str) -> s
 
 
 class Url:
+    """
+    The URL of the pacscript's package.
+
+    Attributes
+    ----------
+    line_number
+        The line number of the URL.
+    value
+        The URL.
+    """
+
     line_number: int = -1
     value: str = ""
 
@@ -99,6 +112,27 @@ class Url:
 
 
 class Pacscript:
+    """
+    The pacscript.
+
+    Attributes
+    ----------
+    path
+        The path to the pacscript.
+    pkgname
+        The package name.
+    version
+        The version of the pacscript.
+    url
+        The URL of the pacscript's package.
+    hash_line
+        The line number of the pacscript's hash.
+    maintainer
+        The maintainer of the pacscript.
+    repology_filters
+        The repology filters of the pacscript.
+    """
+
     def __init__(
         self,
         path: Path,

@@ -22,6 +22,8 @@
 # You should have received a copy of the GNU General Public License
 # along with PacUp.  If not, see <https://www.gnu.org/licenses/>.
 
+"""The version processor module."""
+
 
 from asyncio.locks import Semaphore
 from enum import Enum, auto
@@ -39,6 +41,8 @@ log = getLogger("rich")
 
 
 class VersionStatuses(Enum):
+    """The status of a version."""
+
     UNKNOWN = auto()
     UPDATED = auto()
     OUTDATED = auto()
@@ -46,6 +50,8 @@ class VersionStatuses(Enum):
 
 
 class RepologyErrors(str, Enum):
+    """The errors that can occur when fetching from Repology."""
+
     NOT_FOUND = "Not found on repology"
     NO_PROJECT_FILTER = "No [code]project[/code] filter found in the pacscript"
     NO_FILTERS = "No repology filters found in the pacscript"
@@ -54,6 +60,21 @@ class RepologyErrors(str, Enum):
 
 
 class Version:
+    """
+    A version of a package.
+
+    Attributes
+    ----------
+    line_number
+        The line number of the version in the pacscript.
+    current
+        The current version of the package.
+    latest
+        The latest version of the package.
+    status
+        The status of the version.
+    """
+
     line_number: int = -1
     current: str = ""
     __latest: str = ""
@@ -190,6 +211,15 @@ class Version:
         VersionStatuses.OUTDATED,
         VersionStatuses.NEWER,
     ]:
+        """
+        The status of the version.
+
+        Returns
+        -------
+        Literal[VersionStatuses.UNKNOWN, VersionStatuses.UPDATED, VersionStatuses.OUTDATED, VersionStatuses.NEWER]
+            The status of the version.
+        """
+
         if self.latest in [error.value for error in RepologyErrors]:
             return VersionStatuses.UNKNOWN
 

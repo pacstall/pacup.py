@@ -24,6 +24,8 @@
 # You should have received a copy of the GNU General Public License
 # along with PacUp.  If not, see <https://www.gnu.org/licenses/>.
 
+"""The main Pacup launcher file."""
+
 
 import hashlib
 import subprocess
@@ -214,6 +216,15 @@ def autocomplete_command(
 
 
 def version_callback(value: bool) -> None:
+    """
+    Callback for the version flag.
+
+    Parameters
+    ----------
+    value
+        If the version flag was passed.
+    """
+
     if value:
         rprint(f"PacUp {__version__}")
         raise typer.Exit()
