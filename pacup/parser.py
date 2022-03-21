@@ -191,6 +191,7 @@ class Pacscript:
         hash_line = -1  # Which line contains the hash
         maintainer = ""
         repology_filters: Dict[str, str] = {}
+        release_notes = {}
 
         pacscript_reader_process = await create_subprocess_shell(
             "/bin/bash", stdin=PIPE, stdout=PIPE
@@ -270,27 +271,30 @@ class Pacscript:
         version.latest = await Version.get_latest_version(
             repology_filters, client, semaphore, show_repology
         )
+        if show_repology:
+            log.info(
+                "Skipping release notes fetching due to [code]show_repology[/code] flag."
+            )
+        if not show_repology:
+            log.info("Fetching release notes...")
+            try:
+                if "github" in url.value:
+                    release_notes = await Github(
+                        version.current, url.value, client
+                    ).release_notes
 
-        # Fetch the release notes
-        release_notes = {}
-        try:
-            if "github" in url.value:
-                release_notes = await Github(
-                    version.current, url.value, client
-                ).release_notes
+                elif "gitlab" in url.value:
+                    release_notes = await Gitlab(
+                        version.current, url.value, client
+                    ).release_notes
 
-            elif "gitlab" in url.value:
-                release_notes = await Gitlab(
-                    version.current, url.value, client
-                ).release_notes
+            except (HTTPStatusError, RequestError):
+                pass
 
-        except (HTTPStatusError, RequestError):
-            pass
+            pacscript_reader_process.stdin.close()
+            await pacscript_reader_process.wait()
 
-        pacscript_reader_process.stdin.close()
-        await pacscript_reader_process.wait()
-
-        progress.advance(task)
+            progress.advance(task)
 
         # Return the parsed pacscript object
         return cls(

@@ -225,7 +225,7 @@ def update(
         None,
         "-r",
         "--show-repology",
-        help="Show the parsed repology data.",
+        help="Show the parsed repology data and exit.",
     ),
     debug: Optional[bool] = typer.Option(
         None, "-d", "--debug", help="Turn on debugging mode."
@@ -253,7 +253,9 @@ def update(
 ) -> NoReturn:
     """Updates specified pacscripts."""
 
-    basicConfig(level="CRITICAL", format="%(message)s", handlers=[RichHandler()])
+    basicConfig(
+        level="CRITICAL", format="%(message)s", handlers=[RichHandler(markup=True)]
+    )
     log = getLogger("rich")
 
     if debug:
@@ -405,6 +407,10 @@ def update(
     rprint(
         Panel.fit(version_statuses_table, title="Version statuses", border_style="bold")
     )
+
+    if show_repology:
+        log.info("Exiting early due to [code]show_repology[/code] flag")
+        sys.exit()
 
     # Loop through the parsed pacscripts and update them
     log.info("Updating pacscripts...")

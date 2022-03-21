@@ -45,7 +45,7 @@ Arguments:
   PACSCRIPTS...  The pacscripts to update.  [required]
 
 Options:
-  -r, --show-repology             Show the parsed repology data.
+  -r, --show-repology             Show the parsed repology data and exit.
   -d, --debug                     Turn on debugging mode.
   -v, --verbose                   Turn on verbose mode.
   -V, --version                   Show the version and exit.
