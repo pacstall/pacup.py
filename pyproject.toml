@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pacup"
-version = "0.1.2"
+version = "1.0.0"
 description = "Help maintainers update pacscripts"
 readme = "README.md"
 authors = ["Sourajyoti Basak <wiz28@protonmail.com>"]
