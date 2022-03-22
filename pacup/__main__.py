@@ -498,6 +498,10 @@ def update(
                     pacscript
                 ] = f"{str(error) or type(error).__name__}"
                 continue
+            finally:
+                # Clear downloaded packages
+                log.info("Clearing downloaded package...")
+                rmtree("/tmp/pacup", ignore_errors=True)
 
         # Edit the pacscript file with the new version and hash
         log.info("Editing pacscript file...")
@@ -570,10 +574,6 @@ def update(
                 f"   [bold red]❌[/bold red] Failed to update pacscript [bold red]{path.stem}[/bold red] pacscript!"
             )
             failed_to_update_pacscripts[pacscript] = f"{pkgname} doesn't work"
-
-        # Clear downloaded packages
-        log.info("Clearing downloaded packages...")
-        rmtree("/tmp/pacup", ignore_errors=True)
 
     log.info("Computing summary...")
     summary_table = Table.grid()
