@@ -24,19 +24,19 @@ updating pacscripts, and aims to make it a fun process for the maintainer!
 
 To install the latest release run:
 
-```bash
+```console
 $ pip install pacup
 ```
 
 To install the latest development build run:
 
-```bash
+```console
 $ pip install git+https://github.com/pacstall/pacup
 ```
 
 ## Usage
 
-```monospace
+```console
 Usage: pacup [OPTIONS] PACSCRIPTS...
 
   Updates specified pacscripts.
