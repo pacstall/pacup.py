@@ -154,12 +154,14 @@ async def get_parsed_pacscripts(
         )
 
 
-def validate_parameters(pacscripts: List[Path]) -> List[Path]:
+def validate_parameters(ctx: typer.Context, pacscripts: List[Path]) -> List[Path]:
     """
     Validate command parameters.
 
     Parameters
     ----------
+    ctx
+        The typer context.
     pacscripts
         The list of pacscript paths passed as arguments.
 
@@ -178,6 +180,16 @@ def validate_parameters(pacscripts: List[Path]) -> List[Path]:
     # Not eligible for pacup
     if any(map(lambda pacscript: pacscript.stem.endswith("-git"), pacscripts)):
         raise typer.BadParameter("Git pacscripts are not supported.")
+
+    # Check if ship flag is passed and the directory isn't a git repo
+    if ctx.params.get("ship"):
+        try:
+            subprocess.run(["git", "rev-parse"], check=True, stderr=subprocess.PIPE)
+        except subprocess.CalledProcessError:
+            raise typer.BadParameter("Ship flag can only be used with git repos.")
+
+        if ctx.params.get("show_repology"):
+            raise typer.BadParameter("Ship flag can't be used with --show-repology.")
 
     return pacscripts
 
@@ -249,6 +261,9 @@ def update(
         callback=version_callback,
         is_eager=True,
     ),
+    ship: Optional[bool] = typer.Option(
+        None, "-s", "--ship", help="Prepare the pacscript for shipping to upstream."
+    ),
     pacscripts: List[Path] = typer.Argument(
         ...,
         help="The pacscripts to update.",
@@ -259,7 +274,13 @@ def update(
         autocompletion=autocomplete_command,
     ),
 ) -> NoReturn:
-    """Updates specified pacscripts."""
+    """
+    Updates specified pacscripts.
+
+    If ship flag is passed, the pacscript will be prepared for shipping to
+    upstream. After the pacscript is prepared, it will be committed and pushed
+    to the origin remote. This requires you to be present in your cloned fork.
+    """
 
     basicConfig(
         level="CRITICAL", format="%(message)s", handlers=[RichHandler(markup=True)]
@@ -574,6 +595,164 @@ def update(
                 f"   [bold red]❌[/bold red] Failed to update pacscript [bold red]{path.stem}[/bold red] pacscript!"
             )
             failed_to_update_pacscripts[pacscript] = f"{pkgname} doesn't work"
+
+        # Process ship flag
+        if ship:
+            log.info("Shipping pacscript...")
+
+            rprint("   [bold blue]=>[/bold blue] Shipping pacscript")
+
+            # Checkout the ship branch
+            try:
+                log.info(f"Checking out [bold blue]ship-{path.stem} branch...")
+                subprocess.run(
+                    ["git", "checkout", "-b", f"ship-{path.stem}"],
+                    check=True,
+                    capture_output=True,
+                )
+            except subprocess.CalledProcessError as error:
+                log.error(
+                    f"Could not checkout branch ship-{path.stem}: [bold red]{error.stderr.decode()}[/bold red]"
+                )
+                log.info(f"Asking to delete branch ship-{path.stem}...")
+
+                # Ask the user to confirm whether to delete the branch
+                if Confirm.ask(
+                    f"      [bold blue]::[/bold blue] Do you you want to delete the existing [bold blue]ship-{path.stem}[/bold blue] branch?",
+                    default=True,
+                ):
+                    log.info(f"Deleting branch ship-{path.stem}")
+
+                    # Delete the branch
+                    try:
+                        subprocess.run(
+                            ["git", "branch", "-D", f"ship-{path.stem}"],
+                            check=True,
+                            capture_output=True,
+                        )
+                    except subprocess.CalledProcessError as error:
+                        log.error(
+                            f"Could not delete branch ship-{path.stem}: [bold red]{error.stderr.decode()}[/bold red]"
+                        )
+
+                        rprint(
+                            f"      [bold red]❌[/bold red] Failed to delete [bold red]ship-{path.stem}[/bold red] branch!"
+                        )
+
+                        failed_to_update_pacscripts[
+                            pacscript
+                        ] = f"Failed to delete branch ship-{path.stem}"
+                        continue
+
+                    else:
+                        # Successfully deleted the branch
+                        rprint(
+                            f"      [bold green]:heavy_check_mark:[/bold green] Successfully deleted [bold blue]ship-{path.stem}[/bold blue] branch"
+                        )
+
+                        # Checkout the branch again
+                        log.info(
+                            "Checking out ship-{path.stem} branch after deletion..."
+                        )
+                        try:
+                            subprocess.run(
+                                ["git", "checkout", "-b", f"ship-{path.stem}"],
+                                check=True,
+                                capture_output=True,
+                            )
+                        except subprocess.CalledProcessError as error:
+                            log.error(
+                                f"Could not checkout branch ship-{path.stem} after deletion: [bold red]{error.stderr.decode()}[/bold red]"
+                            )
+
+                            rprint(
+                                f"      [bold red]❌[/bold red] Failed to checkout even after deletion [bold red]{path.stem}[/bold red] pacscript!"
+                            )
+
+                            failed_to_update_pacscripts[
+                                pacscript
+                            ] = f"Failed to checkout branch ship-{path.stem} even after deletion"
+                            continue
+
+                else:
+                    failed_to_update_pacscripts[
+                        pacscript
+                    ] = f"Denied deleting ship-{path.stem} branch"
+                    continue
+
+            rprint(
+                f"      [bold green]:heavy_check_mark:[/bold green] Successfully checked out branch [bold blue]ship-{path.stem}[/bold blue]"
+            )
+
+            log.info("Adding pacscript to git...")
+            try:
+                subprocess.run(
+                    ["git", "add", path],
+                    check=True,
+                    capture_output=True,
+                )
+            except subprocess.CalledProcessError as error:
+                log.error(
+                    f"Could not add {path}: [bold red]{error.stderr.decode()}[/bold red]"
+                )
+                rprint(
+                    f"   [bold red]❌[/bold red] Failed to add [bold red]{path.stem}[/bold red] to git"
+                )
+                failed_to_update_pacscripts[
+                    pacscript
+                ] = f"Failed to add {path.stem} to git"
+                continue
+            else:
+                rprint(
+                    f"      [bold green]:heavy_check_mark:[/bold green] Successfully added [bold blue]{path.stem}[/bold blue] to git"
+                )
+
+            # Commit the changes
+            try:
+                subprocess.run(
+                    [
+                        "git",
+                        "commit",
+                        "-m",
+                        f"upd({path.stem}): `{version.current}` -> `{version.latest}`",
+                    ],
+                    check=True,
+                    capture_output=True,
+                )
+            except subprocess.CalledProcessError as error:
+                log.error(
+                    f"Could not commit {path}: [bold red]{error.stderr.decode()}[/bold red]"
+                )
+                rprint(
+                    f"   [bold red]❌[/bold red] Failed to commit [bold red]{path.stem}[/bold red]"
+                )
+                failed_to_update_pacscripts[pacscript] = f"Failed to commit {path.stem}"
+                continue
+            else:
+                rprint(
+                    f"      [bold green]:heavy_check_mark:[/bold green] Successfully committed [bold blue]{path.stem}[/bold blue]"
+                )
+
+            # Git push to origin
+            try:
+                subprocess.run(
+                    ["git", "push", "--set-upstream", "origin", f"ship-{path.stem}"],
+                    check=True,
+                    capture_output=True,
+                )
+            except subprocess.CalledProcessError as error:
+                log.error(
+                    f"Could not push ship-{path.stem}: [bold red]{error.stderr.decode()}[/bold red]"
+                )
+                rprint(
+                    f"   [bold red]❌[/bold red] Failed to push [bold red]ship-{path.stem}[/bold red]"
+                )
+                failed_to_update_pacscripts[pacscript] = f"Failed to push {path.stem}"
+                continue
+            else:
+                rprint(
+                    f"      [bold green]:heavy_check_mark:[/bold green] Successfully pushed [bold blue]{path.stem}[/bold blue]"
+                )
 
     log.info("Computing summary...")
     summary_table = Table.grid()
