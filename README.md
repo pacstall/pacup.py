@@ -87,6 +87,10 @@ is considered successfully upgraded and the program ends.
 * Doesn't work if a pacscript doesn't have an equivalent
   [Repology](https://repology.org/) package.
 
+## Stats
+
+<p align="center"><img alt="Repobeats analytics image" src="https://repobeats.axiom.co/api/embed/80bc45a6d65fbfb43905aa22b3950badc09edd97.svg" /></p>
+
 ## License
 
 ```monospace
