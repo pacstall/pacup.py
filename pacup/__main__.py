@@ -62,6 +62,7 @@ from rich.syntax import Syntax
 from rich.table import Table
 
 from pacup.parser import Pacscript
+from pacup.utils import level
 from pacup.version import VersionStatuses
 
 __version__ = "1.0.0 Betelgeuse (dev)"
@@ -458,301 +459,322 @@ def update(
             f"[bold blue]=>[/bold blue] Updating {path.stem} pacscript ({version.current} => {version.latest})"
         )
 
-        # Print release notes
-        if release_notes:
-            log.info("Showing release notes...")
-            if Confirm.ask(
-                "    [bold blue]::[/bold blue] Do you want to see the release notes?",
-                default=True,
-            ):
-                for release, release_note in release_notes.items():
-                    rprint(
-                        Panel(
-                            Markdown(release_note),
-                            title=f"Release notes for {release}",
-                            border_style="bold blue",
-                        )
-                    )
-        else:
-            rprint("    [bold red]❌[/bold red] Could not find release notes")
-
-        # Download new package
-        log.info("Downloading new package...")
-        with Progress(
-            "   ",
-            SpinnerColumn(
-                spinner_name="pong", finished_text="[bold green]:heavy_check_mark:"
-            ),
-            "Downloading package",
-            BarColumn(bar_width=None),
-            "[progress.percentage]{task.percentage:>3.1f}%",
-            "•",
-            DownloadColumn(),
-            "•",
-            TimeElapsedColumn(),
-            "•",
-            TransferSpeedColumn(),
-        ) as downloading_package_progress:
-            task = downloading_package_progress.add_task(
-                "Downloading package", start=False
-            )
-            try:
-                latest_hash = loop.run_until_complete(
-                    download(
-                        url.value.replace(version.current, version.latest),
-                        downloading_package_progress,
-                        task,
-                    )
-                )
-            except HTTPStatusError as error:
-                downloading_package_progress.advance(task)
-                rprint(f"   [bold red]❌[/bold red] Could not download package: {error}")
-                failed_to_update_pacscripts[
-                    pacscript
-                ] = f"HTTP status error: {error.response.status_code}"
-                continue
-
-            except RequestError as error:
-                parsing_pacscripts_progress.advance(task)
-                rprint(f"   [bold red]❌[/bold red] Could not download package: {error}")
-                failed_to_update_pacscripts[
-                    pacscript
-                ] = f"{str(error) or type(error).__name__}"
-                continue
-            finally:
-                # Clear downloaded packages
-                log.info("Clearing downloaded package...")
-                rmtree("/tmp/pacup", ignore_errors=True)
-
-        # Edit the pacscript file with the new version and hash
-        log.info("Editing pacscript file...")
-        rprint("    [bold blue]=>[/bold blue] Editing pacscript")
-        edited_lines = lines.copy()
-        edited_lines[version.line_number] = f'version="{version.latest}"\n'
-
-        edited_lines[hash_line] = f'hash="{latest_hash}"\n'
-
-        log.info("Computing diff...")
-        diff = unified_diff(
-            lines,
-            edited_lines,
-            fromfile=f"Outdated {path.name}",
-            tofile=f"Updated {path.name}",
-        )
-
-        log.info("Printing diff...")
-        rprint(
-            Panel(
-                Syntax(
-                    "".join(diff),
-                    "diff",
-                    line_numbers=True,
-                ),
-                title="Diff",
-                border_style="bold blue",
-            )
-        )
-
-        with open(path, "w") as file:
-            log.info("Writing pacscript file...")
-            file.writelines(edited_lines)
-
-        # Install the new pacscript with pacstall
-        log.info("Installing pacscript...")
-
-        rprint("   [bold blue]=>[/bold blue] Installing pacscript using pacstall")
-        rprint(f"[bold blue]{'─' * get_terminal_size().columns}[/bold blue]")
-
-        try:
-            subprocess.run(["pacstall", "-Il", path.stem], check=True)
-        except subprocess.CalledProcessError:
-            log.warning(f"Could not install {path.name}")
-            rprint(f"[bold red]{'─' * get_terminal_size().columns}\n[/bold red]")
-            rprint(
-                f"   [bold red]❌[/bold red]Failed to install pacscript [bold red]{path.stem}[/bold red] pacscript\n"
-            )
-            failed_to_update_pacscripts[
-                pacscript
-            ] = "Installation using pacstall failed"
-            continue
-        else:
-            rprint(f"[bold blue]{'─' * get_terminal_size().columns}[/bold blue]")
-            rprint(
-                f"   [bold green]:heavy_check_mark:[/bold green] Successfully installed [bold blue]{path.stem}[/bold blue] pacscript",
-            )
-
-        # Ask the user to check the installed package
-        # Succeed if the user confirms
-        log.info("Asking user to check installed pacscript...")
-        if Confirm.ask(f"   [bold blue]::[/bold blue] Does {pkgname} work?"):
-            rprint(
-                f"   [bold blue]=>[/bold blue] Finished updating pacscript [bold blue]{path.stem}[/bold blue] pacscript!"
-            )
-
-            successfully_updated_pacscripts.append(pacscript)
-        else:
-            rprint(
-                f"   [bold red]❌[/bold red] Failed to update pacscript [bold red]{path.stem}[/bold red] pacscript!"
-            )
-            failed_to_update_pacscripts[pacscript] = f"{pkgname} doesn't work"
-
-        # Process ship flag
-        if ship:
-            log.info("Shipping pacscript...")
-
-            rprint("   [bold blue]=>[/bold blue] Shipping pacscript")
-
-            # Checkout the ship branch
-            try:
-                log.info(f"Checking out [bold blue]ship-{path.stem} branch...")
-                subprocess.run(
-                    ["git", "checkout", "-b", f"ship-{path.stem}"],
-                    check=True,
-                    capture_output=True,
-                )
-            except subprocess.CalledProcessError as error:
-                log.error(
-                    f"Could not checkout branch ship-{path.stem}: [bold red]{error.stderr.decode()}[/bold red]"
-                )
-                log.info(f"Asking to delete branch ship-{path.stem}...")
-
-                # Ask the user to confirm whether to delete the branch
+        with level() as padding:
+            # Print release notes
+            if release_notes:
+                log.info("Showing release notes...")
                 if Confirm.ask(
-                    f"      [bold blue]::[/bold blue] Do you you want to delete the existing [bold blue]ship-{path.stem}[/bold blue] branch?",
+                    f"{padding}[bold blue]::[/bold blue] Do you want to see the release notes?",
                     default=True,
                 ):
-                    log.info(f"Deleting branch ship-{path.stem}")
-
-                    # Delete the branch
-                    try:
-                        subprocess.run(
-                            ["git", "branch", "-D", f"ship-{path.stem}"],
-                            check=True,
-                            capture_output=True,
-                        )
-                    except subprocess.CalledProcessError as error:
-                        log.error(
-                            f"Could not delete branch ship-{path.stem}: [bold red]{error.stderr.decode()}[/bold red]"
-                        )
-
+                    for release, release_note in release_notes.items():
                         rprint(
-                            f"      [bold red]❌[/bold red] Failed to delete [bold red]ship-{path.stem}[/bold red] branch!"
-                        )
-
-                        failed_to_update_pacscripts[
-                            pacscript
-                        ] = f"Failed to delete branch ship-{path.stem}"
-                        continue
-
-                    else:
-                        # Successfully deleted the branch
-                        rprint(
-                            f"      [bold green]:heavy_check_mark:[/bold green] Successfully deleted [bold blue]ship-{path.stem}[/bold blue] branch"
-                        )
-
-                        # Checkout the branch again
-                        log.info(
-                            "Checking out ship-{path.stem} branch after deletion..."
-                        )
-                        try:
-                            subprocess.run(
-                                ["git", "checkout", "-b", f"ship-{path.stem}"],
-                                check=True,
-                                capture_output=True,
+                            Panel(
+                                Markdown(release_note),
+                                title=f"Release notes for {release}",
+                                border_style="bold blue",
                             )
-                        except subprocess.CalledProcessError as error:
-                            log.error(
-                                f"Could not checkout branch ship-{path.stem} after deletion: [bold red]{error.stderr.decode()}[/bold red]"
-                            )
+                        )
+            else:
+                rprint(f"{padding}[bold red]❌[/bold red] Could not find release notes")
 
-                            rprint(
-                                f"      [bold red]❌[/bold red] Failed to checkout even after deletion [bold red]{path.stem}[/bold red] pacscript!"
-                            )
-
-                            failed_to_update_pacscripts[
-                                pacscript
-                            ] = f"Failed to checkout branch ship-{path.stem} even after deletion"
-                            continue
-
-                else:
+            # Download new package
+            log.info("Downloading new package...")
+            with Progress(
+                f"{' ' * (len(padding) - 1)}",
+                SpinnerColumn(
+                    spinner_name="pong", finished_text="[bold green]:heavy_check_mark:"
+                ),
+                "Downloading package",
+                BarColumn(bar_width=None),
+                "[progress.percentage]{task.percentage:>3.1f}%",
+                "•",
+                DownloadColumn(),
+                "•",
+                TimeElapsedColumn(),
+                "•",
+                TransferSpeedColumn(),
+            ) as downloading_package_progress:
+                task = downloading_package_progress.add_task(
+                    "Downloading package", start=False
+                )
+                try:
+                    latest_hash = loop.run_until_complete(
+                        download(
+                            url.value.replace(version.current, version.latest),
+                            downloading_package_progress,
+                            task,
+                        )
+                    )
+                except HTTPStatusError as error:
+                    downloading_package_progress.advance(task)
+                    rprint(
+                        f"{padding}[bold red]❌[/bold red] Could not download package: {error}"
+                    )
                     failed_to_update_pacscripts[
                         pacscript
-                    ] = f"Denied deleting ship-{path.stem} branch"
+                    ] = f"HTTP status error: {error.response.status_code}"
                     continue
 
-            rprint(
-                f"      [bold green]:heavy_check_mark:[/bold green] Successfully checked out branch [bold blue]ship-{path.stem}[/bold blue]"
+                except RequestError as error:
+                    parsing_pacscripts_progress.advance(task)
+                    rprint(
+                        f"{padding}[bold red]❌[/bold red] Could not download package: {error}"
+                    )
+                    failed_to_update_pacscripts[
+                        pacscript
+                    ] = f"{str(error) or type(error).__name__}"
+                    continue
+                finally:
+                    # Clear downloaded packages
+                    log.info("Clearing downloaded package...")
+                    rmtree("/tmp/pacup", ignore_errors=True)
+
+            # Edit the pacscript file with the new version and hash
+            log.info("Editing pacscript file...")
+            rprint(f"{padding}[bold blue]=>[/bold blue] Editing pacscript")
+            edited_lines = lines.copy()
+            edited_lines[version.line_number] = f'version="{version.latest}"\n'
+
+            edited_lines[hash_line] = f'hash="{latest_hash}"\n'
+
+            log.info("Computing diff...")
+            diff = unified_diff(
+                lines,
+                edited_lines,
+                fromfile=f"Outdated {path.name}",
+                tofile=f"Updated {path.name}",
             )
 
-            log.info("Adding pacscript to git...")
+            log.info("Printing diff...")
+            rprint(
+                Panel(
+                    Syntax(
+                        "".join(diff),
+                        "diff",
+                        line_numbers=True,
+                    ),
+                    title="Diff",
+                    border_style="bold blue",
+                )
+            )
+
+            with open(path, "w") as file:
+                log.info("Writing pacscript file...")
+                file.writelines(edited_lines)
+
+            # Install the new pacscript with pacstall
+            log.info("Installing pacscript...")
+
+            rprint(
+                f"{padding}[bold blue]=>[/bold blue] Installing pacscript using pacstall"
+            )
+            rprint(f"[bold blue]{'─' * get_terminal_size().columns}[/bold blue]")
+
             try:
-                subprocess.run(
-                    ["git", "add", path],
-                    check=True,
-                    capture_output=True,
-                )
-            except subprocess.CalledProcessError as error:
-                log.error(
-                    f"Could not add {path}: [bold red]{error.stderr.decode()}[/bold red]"
-                )
+                subprocess.run(["pacstall", "-Il", path.stem], check=True)
+            except subprocess.CalledProcessError:
+                log.warning(f"Could not install {path.name}")
+                rprint(f"[bold red]{'─' * get_terminal_size().columns}\n[/bold red]")
                 rprint(
-                    f"   [bold red]❌[/bold red] Failed to add [bold red]{path.stem}[/bold red] to git"
+                    f"{padding}[bold red]❌[/bold red]Failed to install pacscript [bold red]{path.stem}[/bold red] pacscript\n"
                 )
                 failed_to_update_pacscripts[
                     pacscript
-                ] = f"Failed to add {path.stem} to git"
+                ] = "Installation using pacstall failed"
                 continue
             else:
+                rprint(f"[bold blue]{'─' * get_terminal_size().columns}[/bold blue]")
                 rprint(
-                    f"      [bold green]:heavy_check_mark:[/bold green] Successfully added [bold blue]{path.stem}[/bold blue] to git"
+                    f"{padding}[bold green]:heavy_check_mark:[/bold green] Successfully installed [bold blue]{path.stem}[/bold blue] pacscript",
                 )
 
-            # Commit the changes
-            try:
-                subprocess.run(
-                    [
-                        "git",
-                        "commit",
-                        "-m",
-                        f"upd({path.stem}): `{version.current}` -> `{version.latest}`",
-                    ],
-                    check=True,
-                    capture_output=True,
-                )
-            except subprocess.CalledProcessError as error:
-                log.error(
-                    f"Could not commit {path}: [bold red]{error.stderr.decode()}[/bold red]"
-                )
+            # Ask the user to check the installed package
+            # Succeed if the user confirms
+            log.info("Asking user to check installed pacscript...")
+            if Confirm.ask(f"{padding}[bold blue]::[/bold blue] Does {pkgname} work?"):
                 rprint(
-                    f"   [bold red]❌[/bold red] Failed to commit [bold red]{path.stem}[/bold red]"
-                )
-                failed_to_update_pacscripts[pacscript] = f"Failed to commit {path.stem}"
-                continue
-            else:
-                rprint(
-                    f"      [bold green]:heavy_check_mark:[/bold green] Successfully committed [bold blue]{path.stem}[/bold blue]"
+                    f"{padding}[bold blue]=>[/bold blue] Finished updating pacscript [bold blue]{path.stem}[/bold blue] pacscript!"
                 )
 
-            # Git push to origin
-            try:
-                subprocess.run(
-                    ["git", "push", "--set-upstream", "origin", f"ship-{path.stem}"],
-                    check=True,
-                    capture_output=True,
-                )
-            except subprocess.CalledProcessError as error:
-                log.error(
-                    f"Could not push ship-{path.stem}: [bold red]{error.stderr.decode()}[/bold red]"
-                )
-                rprint(
-                    f"   [bold red]❌[/bold red] Failed to push [bold red]ship-{path.stem}[/bold red]"
-                )
-                failed_to_update_pacscripts[pacscript] = f"Failed to push {path.stem}"
-                continue
+                successfully_updated_pacscripts.append(pacscript)
             else:
                 rprint(
-                    f"      [bold green]:heavy_check_mark:[/bold green] Successfully pushed [bold blue]{path.stem}[/bold blue]"
+                    f"{padding}[bold red]❌[/bold red] Failed to update pacscript [bold red]{path.stem}[/bold red] pacscript!"
                 )
+                failed_to_update_pacscripts[pacscript] = f"{pkgname} doesn't work"
+                continue
+
+            # Process ship flag
+            if ship:
+                log.info("Shipping pacscript...")
+
+                rprint(f"{padding}[bold blue]=>[/bold blue] Shipping pacscript")
+
+                # Checkout the ship branch
+                try:
+                    log.info(f"Checking out [bold blue]ship-{path.stem} branch...")
+                    subprocess.run(
+                        ["git", "checkout", "-b", f"ship-{path.stem}"],
+                        check=True,
+                        capture_output=True,
+                    )
+                except subprocess.CalledProcessError as error:
+                    log.error(
+                        f"Could not checkout branch ship-{path.stem}: [bold red]{error.stderr.decode()}[/bold red]"
+                    )
+                    log.info(f"Asking to delete branch ship-{path.stem}...")
+
+                    # Ask the user to confirm whether to delete the branch
+                    with level() as padding:
+                        if Confirm.ask(
+                            f"{padding}[bold blue]::[/bold blue] Do you you want to delete the existing [bold blue]ship-{path.stem}[/bold blue] branch?",
+                            default=True,
+                        ):
+                            log.info(f"Deleting branch ship-{path.stem}")
+
+                            # Delete the branch
+                            try:
+                                subprocess.run(
+                                    ["git", "branch", "-D", f"ship-{path.stem}"],
+                                    check=True,
+                                    capture_output=True,
+                                )
+                            except subprocess.CalledProcessError as error:
+                                log.error(
+                                    f"Could not delete branch ship-{path.stem}: [bold red]{error.stderr.decode()}[/bold red]"
+                                )
+
+                                rprint(
+                                    f"{padding}[bold red]❌[/bold red] Failed to delete [bold red]ship-{path.stem}[/bold red] branch!"
+                                )
+
+                                failed_to_update_pacscripts[
+                                    pacscript
+                                ] = f"Failed to delete branch ship-{path.stem}"
+                                continue
+
+                            else:
+                                # Successfully deleted the branch
+                                rprint(
+                                    f"{padding}[bold green]:heavy_check_mark:[/bold green] Successfully deleted [bold blue]ship-{path.stem}[/bold blue] branch"
+                                )
+
+                                # Checkout the branch again
+                                log.info(
+                                    "Checking out ship-{path.stem} branch after deletion..."
+                                )
+                                try:
+                                    subprocess.run(
+                                        ["git", "checkout", "-b", f"ship-{path.stem}"],
+                                        check=True,
+                                        capture_output=True,
+                                    )
+                                except subprocess.CalledProcessError as error:
+                                    log.error(
+                                        f"Could not checkout branch ship-{path.stem} after deletion: [bold red]{error.stderr.decode()}[/bold red]"
+                                    )
+
+                                    rprint(
+                                        f"{padding}[bold red]❌[/bold red] Failed to checkout even after deletion [bold red]{path.stem}[/bold red] pacscript!"
+                                    )
+
+                                    failed_to_update_pacscripts[
+                                        pacscript
+                                    ] = f"Failed to checkout branch ship-{path.stem} even after deletion"
+                                    continue
+
+                        else:
+                            failed_to_update_pacscripts[
+                                pacscript
+                            ] = f"Denied deleting ship-{path.stem} branch"
+                            continue
+
+                    rprint(
+                        f"{padding}[bold green]:heavy_check_mark:[/bold green] Successfully checked out branch [bold blue]ship-{path.stem}[/bold blue]"
+                    )
+
+                log.info("Adding pacscript to git...")
+                try:
+                    subprocess.run(
+                        ["git", "add", path],
+                        check=True,
+                        capture_output=True,
+                    )
+                except subprocess.CalledProcessError as error:
+                    log.error(
+                        f"Could not add {path}: [bold red]{error.stderr.decode()}[/bold red]"
+                    )
+                    rprint(
+                        f"{padding}[bold red]❌[/bold red] Failed to add [bold red]{path.stem}[/bold red] to git"
+                    )
+                    failed_to_update_pacscripts[
+                        pacscript
+                    ] = f"Failed to add {path.stem} to git"
+                    continue
+                else:
+                    with level() as padding:
+                        rprint(
+                            f"{padding}[bold green]:heavy_check_mark:[/bold green] Successfully added [bold blue]{path.stem}[/bold blue] to git"
+                        )
+
+                # Commit the changes
+                try:
+                    subprocess.run(
+                        [
+                            "git",
+                            "commit",
+                            "-m",
+                            f"upd({path.stem}): `{version.current}` -> `{version.latest}`",
+                        ],
+                        check=True,
+                        capture_output=True,
+                    )
+                except subprocess.CalledProcessError as error:
+                    log.error(
+                        f"Could not commit {path}: [bold red]{error.stderr.decode()}[/bold red]"
+                    )
+                    rprint(
+                        f"{padding}[bold red]❌[/bold red] Failed to commit [bold red]{path.stem}[/bold red]"
+                    )
+                    failed_to_update_pacscripts[
+                        pacscript
+                    ] = f"Failed to commit {path.stem}"
+                    continue
+                else:
+                    with level() as padding:
+                        rprint(
+                            f"{padding}[bold green]:heavy_check_mark:[/bold green] Successfully committed [bold blue]{path.stem}[/bold blue]"
+                        )
+
+                # Git push to origin
+                try:
+                    subprocess.run(
+                        [
+                            "git",
+                            "push",
+                            "--set-upstream",
+                            "origin",
+                            f"ship-{path.stem}",
+                        ],
+                        check=True,
+                        capture_output=True,
+                    )
+                except subprocess.CalledProcessError as error:
+                    log.error(
+                        f"Could not push ship-{path.stem}: [bold red]{error.stderr.decode()}[/bold red]"
+                    )
+                    rprint(
+                        f"{padding}[bold red]❌[/bold red] Failed to push [bold red]ship-{path.stem}[/bold red]"
+                    )
+                    failed_to_update_pacscripts[
+                        pacscript
+                    ] = f"Failed to push {path.stem}"
+                    continue
+                else:
+                    rprint(
+                        f"{padding}[bold green]:heavy_check_mark:[/bold green] Successfully pushed [bold blue]{path.stem}[/bold blue]"
+                    )
 
     log.info("Computing summary...")
     summary_table = Table.grid()
