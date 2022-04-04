@@ -54,7 +54,7 @@ from rich.progress import (
     SpinnerColumn,
     TaskID,
     TextColumn,
-    TimeElapsedColumn,
+    TimeRemainingColumn,
     TransferSpeedColumn,
 )
 from rich.prompt import Confirm
@@ -491,7 +491,7 @@ def update(
                 "•",
                 DownloadColumn(),
                 "•",
-                TimeElapsedColumn(),
+                TimeRemainingColumn(),
                 "•",
                 TransferSpeedColumn(),
             ) as downloading_package_progress:
