@@ -244,7 +244,7 @@ def version_callback(value: bool) -> None:
 
 
 @app.command()
-def update(
+def command(
     show_repology: Optional[bool] = typer.Option(
         None,
         "-r",
