@@ -41,7 +41,7 @@ from shutil import rmtree
 from typing import Dict, Generator, List, NoReturn, Optional
 
 import typer
-from httpx import AsyncClient, HTTPStatusError, RequestError
+from httpx import AsyncClient, HTTPStatusError, RequestError, Response
 from rich import print as rprint
 from rich import traceback
 from rich.logging import RichHandler
@@ -70,6 +70,10 @@ __version__ = "1.0.0 Betelgeuse (dev)"
 app = typer.Typer(name="pacup")
 
 
+basicConfig(level="CRITICAL", format="%(message)s", handlers=[RichHandler(markup=True)])
+log = getLogger("rich")
+
+
 async def download(url: str, progress: Progress, task: TaskID) -> str:
     """
     Download a package from a URL.
@@ -91,8 +95,7 @@ async def download(url: str, progress: Progress, task: TaskID) -> str:
 
     download_hash = hashlib.sha256()
 
-    async with AsyncClient(follow_redirects=True).stream("GET", url) as response:
-        response.raise_for_status()
+    async def _process_response(response: Response) -> str:
         makedirs("/tmp/pacup", exist_ok=True)
         progress.update(task, total=int(response.headers["Content-Length"]))
 
@@ -107,6 +110,21 @@ async def download(url: str, progress: Progress, task: TaskID) -> str:
 
         # NOTE: Hash calculation is only done here at the end
         return download_hash.hexdigest()
+
+    async with AsyncClient(follow_redirects=True).stream("GET", url) as response:
+        response.raise_for_status()
+
+        if "content-length" not in response.headers:
+            log.warning("Content length not found in response, trying workaround...")
+
+            async with AsyncClient(
+                follow_redirects=True, headers={"Accept-Encoding": "identity"}
+            ).stream("GET", url) as response:
+                response.raise_for_status()
+
+                return await _process_response(response)
+
+        return await _process_response(response)
 
 
 async def get_parsed_pacscripts(
@@ -282,11 +300,6 @@ def command(
     upstream. After the pacscript is prepared, it will be committed and pushed
     to the origin remote. This requires you to be present in your cloned fork.
     """
-
-    basicConfig(
-        level="CRITICAL", format="%(message)s", handlers=[RichHandler(markup=True)]
-    )
-    log = getLogger("rich")
 
     if debug:
         log.setLevel("DEBUG")
