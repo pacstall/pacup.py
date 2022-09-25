@@ -39,7 +39,7 @@ classifiers = [
 python = "^3.8"
 httpx = ">=0.22,<0.24"
 rich = "^12.2.0"
-typer = "^0.4.1"
+typer = ">=0.4.1,<0.7.0"
 packaging = "^21.3"
 
 [tool.poetry.dev-dependencies]
