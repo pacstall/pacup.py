@@ -160,19 +160,16 @@ class Version:
 
                 log.info("Filtering...")
                 for key, value in filters.items():
-                    new_filtered: List[Dict[str, Any]] = []
-                    for packages in filtered:
-                        if key in packages and packages[key] == value:
-                            new_filtered.append(packages)
-                    if new_filtered:
+                    if new_filtered := [
+                        packages
+                        for packages in filtered
+                        if key in packages and packages[key] == value
+                    ]:
                         filtered = new_filtered
 
                 # Map the versions to their list of packages
                 log.info("Mapping the versions to their filtered packages...")
-                versions: List[str] = []
-
-                for package in filtered:
-                    versions.append(package["version"])
+                versions: List[str] = [package["version"] for package in filtered]
 
                 log.debug(f"{filtered = }")
                 log.debug(f"{versions = }")
