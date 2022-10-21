@@ -771,7 +771,6 @@ def command(
                             f"ship-{path.stem}",
                         ],
                         check=True,
-                        capture_output=True,
                     )
                 except subprocess.CalledProcessError as error:
                     log.error(
