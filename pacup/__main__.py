@@ -585,7 +585,7 @@ def command(
             rprint(f"[bold blue]{'─' * get_terminal_size().columns}[/bold blue]")
 
             try:
-                subprocess.run(["pacstall", "-I", path + ".pacscript"], check=True)
+                subprocess.run(["pacstall", "-I", path], check=True)
             except subprocess.CalledProcessError:
                 log.warning(f"Could not install {path.name}")
                 rprint(f"[bold red]{'─' * get_terminal_size().columns}\n[/bold red]")
