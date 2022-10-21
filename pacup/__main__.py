@@ -573,6 +573,22 @@ def command(
             )
 
             if ship:
+                log.info(f"Checking out [bold blue]master[/bold blue] branch...")
+
+                try:
+                    subprocess.run(
+                        ["git", "checkout", "master"], check=True, capture_output=True
+                    )
+                except subprocess.CalledProcessError as error:
+                    log.error(
+                        f"Could not checkout master branch: [bold red]{error.stderr.decode()}[/bold red]"
+                    )
+
+                    failed_to_update_pacscripts[
+                        pacscript
+                    ] = f"Failed to checkout master branch"
+                    break
+
                 # Checkout the ship branch
                 try:
                     log.info(f"Checking out [bold blue]ship-{path.stem} branch...")
