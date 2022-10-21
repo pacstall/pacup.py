@@ -572,58 +572,7 @@ def command(
                 )
             )
 
-            with open(path, "w") as file:
-                log.info("Writing pacscript file...")
-                file.writelines(edited_lines)
-
-            # Install the new pacscript with pacstall
-            log.info("Installing pacscript...")
-
-            rprint(
-                f"{padding}[bold blue]=>[/bold blue] Installing pacscript using pacstall"
-            )
-            rprint(f"[bold blue]{'─' * get_terminal_size().columns}[/bold blue]")
-
-            try:
-                subprocess.run(["pacstall", "-I", path], check=True)
-            except subprocess.CalledProcessError:
-                log.warning(f"Could not install {path.name}")
-                rprint(f"[bold red]{'─' * get_terminal_size().columns}\n[/bold red]")
-                rprint(
-                    f"{padding}[bold red]❌[/bold red]Failed to install pacscript [bold red]{path.stem}[/bold red] pacscript\n"
-                )
-                failed_to_update_pacscripts[
-                    pacscript
-                ] = "Installation using pacstall failed"
-                continue
-            else:
-                rprint(f"[bold blue]{'─' * get_terminal_size().columns}[/bold blue]")
-                rprint(
-                    f"{padding}[bold green]:heavy_check_mark:[/bold green] Successfully installed [bold blue]{path.stem}[/bold blue] pacscript",
-                )
-
-            # Ask the user to check the installed package
-            # Succeed if the user confirms
-            log.info("Asking user to check installed pacscript...")
-            if Confirm.ask(f"{padding}[bold blue]::[/bold blue] Does {pkgname} work?"):
-                rprint(
-                    f"{padding}[bold blue]=>[/bold blue] Finished updating pacscript [bold blue]{path.stem}[/bold blue] pacscript!"
-                )
-
-                successfully_updated_pacscripts.append(pacscript)
-            else:
-                rprint(
-                    f"{padding}[bold red]❌[/bold red] Failed to update pacscript [bold red]{path.stem}[/bold red] pacscript!"
-                )
-                failed_to_update_pacscripts[pacscript] = f"{pkgname} doesn't work"
-                continue
-
-            # Process ship flag
             if ship:
-                log.info("Shipping pacscript...")
-
-                rprint(f"{padding}[bold blue]=>[/bold blue] Shipping pacscript")
-
                 # Checkout the ship branch
                 try:
                     log.info(f"Checking out [bold blue]ship-{path.stem} branch...")
@@ -706,6 +655,58 @@ def command(
                     rprint(
                         f"{padding}[bold green]:heavy_check_mark:[/bold green] Successfully checked out branch [bold blue]ship-{path.stem}[/bold blue]"
                     )
+
+            with open(path, "w") as file:
+                log.info("Writing pacscript file...")
+                file.writelines(edited_lines)
+
+            # Install the new pacscript with pacstall
+            log.info("Installing pacscript...")
+
+            rprint(
+                f"{padding}[bold blue]=>[/bold blue] Installing pacscript using pacstall"
+            )
+            rprint(f"[bold blue]{'─' * get_terminal_size().columns}[/bold blue]")
+
+            try:
+                subprocess.run(["pacstall", "-I", path], check=True)
+            except subprocess.CalledProcessError:
+                log.warning(f"Could not install {path.name}")
+                rprint(f"[bold red]{'─' * get_terminal_size().columns}\n[/bold red]")
+                rprint(
+                    f"{padding}[bold red]❌[/bold red]Failed to install pacscript [bold red]{path.stem}[/bold red] pacscript\n"
+                )
+                failed_to_update_pacscripts[
+                    pacscript
+                ] = "Installation using pacstall failed"
+                continue
+            else:
+                rprint(f"[bold blue]{'─' * get_terminal_size().columns}[/bold blue]")
+                rprint(
+                    f"{padding}[bold green]:heavy_check_mark:[/bold green] Successfully installed [bold blue]{path.stem}[/bold blue] pacscript",
+                )
+
+            # Ask the user to check the installed package
+            # Succeed if the user confirms
+            log.info("Asking user to check installed pacscript...")
+            if Confirm.ask(f"{padding}[bold blue]::[/bold blue] Does {pkgname} work?"):
+                rprint(
+                    f"{padding}[bold blue]=>[/bold blue] Finished updating pacscript [bold blue]{path.stem}[/bold blue] pacscript!"
+                )
+
+                successfully_updated_pacscripts.append(pacscript)
+            else:
+                rprint(
+                    f"{padding}[bold red]❌[/bold red] Failed to update pacscript [bold red]{path.stem}[/bold red] pacscript!"
+                )
+                failed_to_update_pacscripts[pacscript] = f"{pkgname} doesn't work"
+                continue
+
+            # Process ship flag
+            if ship:
+                log.info("Shipping pacscript...")
+
+                rprint(f"{padding}[bold blue]=>[/bold blue] Shipping pacscript")
 
                 log.info("Adding pacscript to git...")
                 try:
