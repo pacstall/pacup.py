@@ -117,12 +117,19 @@ async def download(url: str, progress: Progress, task: TaskID) -> str:
         if "content-length" not in response.headers:
             log.warning("Content length not found in response, trying workaround...")
 
-            async with AsyncClient(
-                follow_redirects=True, headers={"Accept-Encoding": "identity"}
-            ).stream("GET", url) as response:
-                response.raise_for_status()
+            attempt = 1
 
-                return await _process_response(response)
+            while True:
+                log.warning(f"Attempt [bold blue]{attempt}[/bold blue]")
+                attempt += 1
+
+                async with AsyncClient(
+                    follow_redirects=True, headers={"Accept-Encoding": "identity"}
+                ).stream("GET", url) as response:
+                    response.raise_for_status()
+
+                    if "content-length" in response.headers:
+                        return await _process_response(response)
 
         return await _process_response(response)
 
