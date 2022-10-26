@@ -39,21 +39,30 @@ $ pip install git+https://github.com/pacstall/pacup
 ```console
 Usage: pacup [OPTIONS] PACSCRIPTS...
 
-  Updates specified pacscripts.
+Updates specified pacscripts.
+If ship flag is passed, the pacscript will be prepared for shipping to upstream.
+After the pacscript is prepared, it will be committed and pushed to the origin remote.
+This requires you to be present in your cloned fork.
 
-Arguments:
-  PACSCRIPTS...  The pacscripts to update.  [required]
-
-Options:
-  -r, --show-repology             Show the parsed repology data and exit.
-  -d, --debug                     Turn on debugging mode.
-  -v, --version                   Show the version and exit.
-  --install-completion [bash|zsh|fish|powershell|pwsh]
-                                  Install completion for the specified shell.
-  --show-completion [bash|zsh|fish|powershell|pwsh]
-                                  Show completion for the specified shell, to
-                                  copy it or customize the installation.
-  --help                          Show this message and exit.
+╭─ Arguments ──────────────────────────────────────────────────────────────────────────────────────────╮
+│ *    pacscripts      PACSCRIPTS...  The pacscripts to update. [default: None] [required]             │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Options ────────────────────────────────────────────────────────────────────────────────────────────╮
+│ --show-repology       -r                                       Show the parsed repology data and     │
+│                                                                exit.                                 │
+│ --debug               -d                                       Turn on debugging mode.               │
+│ --version             -v                                       Show the version and exit.            │
+│ --ship                -s                                       Prepare the pacscript for shipping to │
+│                                                                upstream.                             │
+│ --install-completion          [bash|zsh|fish|powershell|pwsh]  Install completion for the specified  │
+│                                                                shell.                                │
+│                                                                [default: None]                       │
+│ --show-completion             [bash|zsh|fish|powershell|pwsh]  Show completion for the specified     │
+│                                                                shell, to copy it or customize the    │
+│                                                                installation.                         │
+│                                                                [default: None]                       │
+│ --help                                                         Show this message and exit.           │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 
 You can get this help text by running `pacup --help`.
