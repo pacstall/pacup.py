@@ -25,7 +25,7 @@ updating pacscripts, and aims to make it a fun process for the maintainer!
 To install the latest release run:
 
 ```console
-$ pip install pacup
+$ pacstall -I pacup-bin # or pip install pacup
 ```
 
 To install the latest development build run:
