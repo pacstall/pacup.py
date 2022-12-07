@@ -30,9 +30,7 @@
 import hashlib
 import subprocess
 import sys
-from asyncio import gather
-from asyncio.events import get_event_loop
-from asyncio.locks import Semaphore
+from asyncio import Semaphore, gather, get_event_loop_policy
 from difflib import unified_diff
 from logging import basicConfig, getLogger
 from os import get_terminal_size, makedirs
@@ -325,7 +323,7 @@ def command(
         task = parsing_pacscripts_progress.add_task(
             "Parsing pacscripts", total=len(pacscripts)
         )
-        loop = get_event_loop()
+        loop = get_event_loop_policy().get_event_loop()
         parsed_pacscripts: List[Pacscript] = loop.run_until_complete(
             get_parsed_pacscripts(
                 pacscripts, task, parsing_pacscripts_progress, show_repology
