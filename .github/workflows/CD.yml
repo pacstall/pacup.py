@@ -33,8 +33,8 @@ jobs:
         run: |
             source .venv/bin/activate
             mkdir -p build/
-            nuitka3 --assume-yes-for-downloads --show-progress --lto=yes --follow-imports --output-dir=build --output-filename=build/pacup pacup/
+            pyinstaller --name pacup --onefile pacup/__main__.py
       - uses: actions/upload-artifact@v3
         with:
           name: pacup
-          path: build/pacup
+          path: dist/pacup
