@@ -63,7 +63,7 @@ from pacup.parser import Pacscript
 from pacup.utils import level
 from pacup.version import VersionStatuses
 
-__version__ = "1.0.0 Betelgeuse"
+__version__ = "1.0.1 Halley"
 
 app = typer.Typer(name="pacup")
 
