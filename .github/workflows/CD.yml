@@ -20,7 +20,7 @@ jobs:
           virtualenvs-create: true
           virtualenvs-in-project: true
           installer-parallel: true
-      - name: Load cached venv and build
+      - name: Load cached venv and build cache
         uses: actions/cache@v3
         with:
           path: |
@@ -29,7 +29,7 @@ jobs:
           key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
       - name: Install project
         run: poetry install --no-interaction --no-root --without dev --with build
-      - name: Build
+      - name: Build binary using PyInstaller
         run: |
           source .venv/bin/activate
           mkdir -p build/
@@ -40,6 +40,11 @@ jobs:
         with:
           name: pacup
           path: dist/pacup
+      - name: Build and publish to PyPI
+        uses: JRubics/poetry-publish@v1.15
+        if: github.event_name != 'workflow_dispatch'
+        with:
+          pypi_token: ${{ secrets.PYPI_TOKEN }}
       - name: Release assets
         uses: softprops/action-gh-release@v1
         if: github.event_name != 'workflow_dispatch'
