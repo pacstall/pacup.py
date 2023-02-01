@@ -43,7 +43,7 @@ typer = ">=0.4.1,<0.8.0"
 packaging = ">=23,<23.1"
 
 [tool.poetry.group.dev.dependencies]
-black = "^22.12.0"
+black = "^23.0.0"
 codespell = "^2.2.2"
 isort = "^5.11.2"
 mypy = "^0.991"
