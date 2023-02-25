@@ -474,7 +474,7 @@ def command(
         lines = pacscript.lines
 
         rprint(
-            f"[bold blue]=>[/bold blue] Updating {path.stem} pacscript ({version.current} => {version.latest})"
+            f"[bold blue]=>[/bold blue] Updating {path.stem} pacscript ([bold cyan]{version.current}[/bold cyan] => [bold cyan]{version.latest}[/bold cyan])"
         )
 
         with level() as padding:
