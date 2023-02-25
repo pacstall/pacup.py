@@ -63,7 +63,7 @@ from pacup.parser import Pacscript
 from pacup.utils import level
 from pacup.version import VersionStatuses
 
-__version__ = "1.0.2 Hyakutake"
+__version__ = "1.0.3 Chiron"
 
 app = typer.Typer(name="pacup")
 
