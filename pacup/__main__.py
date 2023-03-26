@@ -578,7 +578,7 @@ def command(
             )
 
             if ship:
-                log.info(f"Checking out [bold blue]master[/bold blue] branch...")
+                log.info("Checking out [bold blue]master[/bold blue] branch...")
 
                 try:
                     subprocess.run(
@@ -591,7 +591,7 @@ def command(
 
                     failed_to_update_pacscripts[
                         pacscript
-                    ] = f"Failed to checkout master branch"
+                    ] = "Failed to checkout master branch"
                     break
 
                 # Checkout the ship branch
