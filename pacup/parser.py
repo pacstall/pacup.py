@@ -228,7 +228,7 @@ class Pacscript:
         release_notes = {}
 
         pacscript_reader_process = await create_subprocess_shell(
-            "/bin/bash", stdin=PIPE, stdout=PIPE
+            "/usr/bin/env bash", stdin=PIPE, stdout=PIPE
         )
 
         assert pacscript_reader_process.stdin is not None
