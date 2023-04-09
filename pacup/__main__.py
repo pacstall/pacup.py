@@ -516,10 +516,12 @@ def command(
                 task = downloading_package_progress.add_task(
                     "Downloading package", start=False
                 )
+                latest_url = url.value.replace(version.current, version.latest)
+                file_name = latest_url.split("/")[-1]
                 try:
                     latest_hash = loop.run_until_complete(
                         download(
-                            url.value.replace(version.current, version.latest),
+                            latest_url,
                             downloading_package_progress,
                             task,
                         )
@@ -543,10 +545,6 @@ def command(
                         pacscript
                     ] = f"{str(error) or type(error).__name__}"
                     continue
-                finally:
-                    # Clear downloaded packages
-                    log.info("Clearing downloaded package...")
-                    rmtree("/tmp/pacup", ignore_errors=True)
 
             # Edit the pacscript file with the new version and hash
             log.info("Editing pacscript file...")
@@ -690,7 +688,14 @@ def command(
             rprint(f"[bold blue]{'─' * get_terminal_size().columns}[/bold blue]")
 
             try:
-                subprocess.run(["pacstall", "-I", path], check=True)
+                subprocess.run(
+                    [
+                        "bash",
+                        "-c",
+                        f"PACSTALL_PAYLOAD=/tmp/pacup/{file_name} pacstall -I {path}",
+                    ],
+                    check=True,
+                )
             except subprocess.CalledProcessError:
                 log.warning(f"Could not install {path.name}")
                 rprint(f"[bold red]{'─' * get_terminal_size().columns}\n[/bold red]")
@@ -701,11 +706,17 @@ def command(
                     pacscript
                 ] = "Installation using pacstall failed"
                 continue
+
             else:
                 rprint(f"[bold blue]{'─' * get_terminal_size().columns}[/bold blue]")
                 rprint(
                     f"{padding}[bold green]:heavy_check_mark:[/bold green] Successfully installed [bold blue]{path.stem}[/bold blue] pacscript",
                 )
+
+            finally:
+                # Clear downloaded packages
+                log.info("Clearing downloaded package...")
+                rmtree("/tmp/pacup", ignore_errors=True)
 
             # Ask the user to check the installed package
             # Succeed if the user confirms
