@@ -26,9 +26,10 @@
 
 
 from asyncio.locks import Semaphore
+from collections import Counter
 from enum import Enum, auto
 from logging import getLogger
-from typing import Any, Counter, Dict, List, Literal, Optional, Union
+from typing import Any, Literal
 
 from httpx import AsyncClient, HTTPStatusError, RequestError
 from packaging import version as pkg_version
@@ -77,7 +78,7 @@ class Version:
 
     line_number: int = -1
     current: str = ""
-    __latest: str = ""
+    latest: str = ""
 
     def __init__(self, line_number: int = -1, version: str = "", latest: str = ""):
         self.line_number = line_number
@@ -86,20 +87,18 @@ class Version:
 
     @staticmethod
     async def get_latest_version(
-        filters: Dict[str, str],
+        filters: dict[str, str],
         client: AsyncClient,
         semaphore: Semaphore,
-        show_repology: Optional[bool],
+        show_repology: bool | None,
     ) -> (
-        Union[
-            str,
-            Literal[
-                RepologyErrors.NOT_FOUND,
-                RepologyErrors.NO_PROJECT_FILTER,
-                RepologyErrors.NO_FILTERS,
-                RepologyErrors.HTTP_STATUS_ERROR,
-                RepologyErrors.REQUEST_ERROR,
-            ],
+        str
+        | Literal[
+            RepologyErrors.NOT_FOUND,
+            RepologyErrors.NO_PROJECT_FILTER,
+            RepologyErrors.NO_FILTERS,
+            RepologyErrors.HTTP_STATUS_ERROR,
+            RepologyErrors.REQUEST_ERROR,
         ]
     ):
         """
@@ -156,7 +155,7 @@ class Version:
                 return RepologyErrors.HTTP_STATUS_ERROR
 
             else:
-                filtered: List[Dict[str, Any]] = response.json()
+                filtered: list[dict[str, Any]] = response.json()
 
                 log.info("Filtering...")
                 for key, value in filters.items():
@@ -169,7 +168,7 @@ class Version:
 
                 # Map the versions to their list of packages
                 log.info("Mapping the versions to their filtered packages...")
-                versions: List[str] = [package["version"] for package in filtered]
+                versions: list[str] = [package["version"] for package in filtered]
 
                 log.debug(f"{filtered = }")
                 log.debug(f"{versions = }")

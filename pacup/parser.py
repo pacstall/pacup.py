@@ -29,7 +29,6 @@ from asyncio.locks import Semaphore
 from asyncio.subprocess import PIPE, Process, create_subprocess_shell
 from logging import getLogger
 from pathlib import Path
-from typing import Dict, List, Optional
 
 from httpx import AsyncClient, HTTPStatusError, RequestError
 from rich.progress import Progress, TaskID
@@ -141,9 +140,9 @@ class Pacscript:
         url: Url,
         hash_line: int,
         maintainer: str,
-        repology_filters: Dict[str, str],
-        release_notes: Dict[str, str],
-        lines: List[str],
+        repology_filters: dict[str, str],
+        release_notes: dict[str, str],
+        lines: list[str],
     ):
         """
         Parameters
@@ -186,7 +185,7 @@ class Pacscript:
         semaphore: Semaphore,
         task: TaskID,
         progress: Progress,
-        show_repology: Optional[bool],
+        show_repology: bool | None,
     ) -> "Pacscript":
         """
         Parses a pacscript file.
@@ -224,7 +223,7 @@ class Pacscript:
         url = Url()
         hash_line = -1  # Which line contains the hash
         maintainer = ""
-        repology_filters: Dict[str, str] = {}
+        repology_filters: dict[str, str] = {}
         release_notes = {}
 
         pacscript_reader_process = await create_subprocess_shell(

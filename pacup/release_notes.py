@@ -28,7 +28,6 @@
 
 from abc import ABC, abstractmethod
 from logging import getLogger
-from typing import Dict, List, Optional
 
 from httpx import AsyncClient
 
@@ -66,7 +65,7 @@ class Repository(ABC):
 
     @property
     @abstractmethod
-    async def release_notes(self) -> Optional[Dict[str, str]]:
+    async def release_notes(self) -> dict[str, str] | None:
         """
         Returns the release notes of the releases from the latest to the
         current release.
@@ -81,7 +80,7 @@ class Repository(ABC):
 
     def _back_calculate_current_release_index(
         self,
-        releases: List[Dict[str, str]],
+        releases: list[dict[str, str]],
     ) -> int:
         """
         Back calculates the index of the current release in the list of releases.
@@ -112,8 +111,8 @@ class Repository(ABC):
     def _get_release_notes(
         self,
         current_release_index: int,
-        response: List[Dict[str, str]],
-    ) -> Dict[str, str]:
+        response: list[dict[str, str]],
+    ) -> dict[str, str]:
         """
         Returns the release notes of the releases from the latest to the
         current release.
@@ -133,7 +132,7 @@ class Repository(ABC):
             release.
         """
 
-        release_notes: Dict[str, str] = {}
+        release_notes: dict[str, str] = {}
         for index, release in enumerate(response):
             if index == current_release_index:
                 break
@@ -154,7 +153,7 @@ class Github(Repository):
     description = "body"
 
     @property
-    async def release_notes(self) -> Dict[str, str]:
+    async def release_notes(self) -> dict[str, str]:
         """Get the release notes of the releases from the latest to the current."""
 
         owner = self.url.split("/")[3]
@@ -190,7 +189,7 @@ class Gitlab(Repository):
     """
 
     @property
-    async def release_notes(self) -> Dict[str, str]:
+    async def release_notes(self) -> dict[str, str]:
         """Get the release notes of the releases from the latest to the current."""
 
         if "projects" in self.url:

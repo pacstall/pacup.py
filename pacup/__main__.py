@@ -31,12 +31,13 @@ import hashlib
 import subprocess
 import sys
 from asyncio import Semaphore, gather, get_event_loop_policy
+from collections.abc import Generator
 from difflib import unified_diff
 from logging import basicConfig, getLogger
 from os import get_terminal_size, makedirs
 from pathlib import Path
 from shutil import rmtree
-from typing import Dict, Generator, List, NoReturn, Optional
+from typing import NoReturn, Optional
 
 import typer
 from httpx import AsyncClient, HTTPStatusError, RequestError, Response
@@ -133,11 +134,11 @@ async def download(url: str, progress: Progress, task: TaskID) -> str:
 
 
 async def get_parsed_pacscripts(
-    pacscripts: List[Path],
+    pacscripts: list[Path],
     task: TaskID,
     progress: Progress,
-    show_repology: Optional[bool],
-) -> List[Pacscript]:
+    show_repology: bool | None,
+) -> list[Pacscript]:
     """
     Get the parsed pacscripts from a list of pacscript paths.
 
@@ -178,7 +179,7 @@ async def get_parsed_pacscripts(
         )
 
 
-def validate_parameters(ctx: typer.Context, pacscripts: List[Path]) -> List[Path]:
+def validate_parameters(ctx: typer.Context, pacscripts: list[Path]) -> list[Path]:
     """
     Validate command parameters.
 
@@ -266,6 +267,7 @@ def version_callback(value: bool) -> None:
         raise typer.Exit()
 
 
+# HACK: This uses `Optional` due to a typer bug: https://github.com/tiangolo/typer/issues/533
 @app.command()
 def command(
     show_repology: Optional[bool] = typer.Option(
@@ -288,7 +290,7 @@ def command(
     ship: Optional[bool] = typer.Option(
         None, "-s", "--ship", help="Prepare the pacscript for shipping to upstream."
     ),
-    pacscripts: List[Path] = typer.Argument(
+    pacscripts: list[Path] = typer.Argument(
         ...,
         help="The pacscripts to update.",
         exists=True,
@@ -324,7 +326,7 @@ def command(
             "Parsing pacscripts", total=len(pacscripts)
         )
         loop = get_event_loop_policy().get_event_loop()
-        parsed_pacscripts: List[Pacscript] = loop.run_until_complete(
+        parsed_pacscripts: list[Pacscript] = loop.run_until_complete(
             get_parsed_pacscripts(
                 pacscripts, task, parsing_pacscripts_progress, show_repology
             )
@@ -337,10 +339,10 @@ def command(
     version_statuses_table = Table.grid()
     version_statuses_table.add_column()
 
-    outdated_pacscripts: List[Pacscript] = []
-    updated_pacscripts: List[Pacscript] = []
-    newer_pacscripts: List[Pacscript] = []
-    unknown_pacscripts: List[Pacscript] = []
+    outdated_pacscripts: list[Pacscript] = []
+    updated_pacscripts: list[Pacscript] = []
+    newer_pacscripts: list[Pacscript] = []
+    unknown_pacscripts: list[Pacscript] = []
     for pacscript in parsed_pacscripts:
         if pacscript.version.status == VersionStatuses.OUTDATED:
             outdated_pacscripts.append(pacscript)
@@ -462,8 +464,8 @@ def command(
 
     # Loop through the parsed pacscripts and update them
     log.info("Updating pacscripts...")
-    successfully_updated_pacscripts: List[Pacscript] = []
-    failed_to_update_pacscripts: Dict[Pacscript, str] = {}
+    successfully_updated_pacscripts: list[Pacscript] = []
+    failed_to_update_pacscripts: dict[Pacscript, str] = {}
     for pacscript in outdated_pacscripts:
         path = pacscript.path
         pkgname = pacscript.pkgname

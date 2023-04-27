@@ -24,8 +24,8 @@
 
 """Utility functions."""
 
+from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Generator
 
 current_level = 0
 

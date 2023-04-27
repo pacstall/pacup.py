@@ -1,12 +1,5 @@
 ci:
-  skip: [
-    codespell,
-    black,
-    isort,
-    pyupgrade,
-    mypy
-  ]
-
+  skip: [codespell, black, isort, pyupgrade, mypy]
 repos:
   # General
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -26,10 +19,7 @@ repos:
     rev: v1.4.2
     hooks:
       - id: insert-license
-        args: [
-          "--license-filepath=LICENSE_BOILERPLATE",
-          "--detect-license-in-X-top-lines=20"
-        ]
+        args: ["--license-filepath=LICENSE_BOILERPLATE", "--detect-license-in-X-top-lines=20"]
         exclude: '^(.github|.git)'
         types: [text]
   # Python
@@ -38,16 +28,7 @@ repos:
       - id: codespell
         name: Check for misspellings
         description: Checks for common misspellings in text files
-        args: [
-          --check-hidden,
-          --check-filenames,
-          --builtin,
-          clear,
-          rare,
-          informal,
-          usage,
-          code
-        ]
+        args: [--check-hidden, --check-filenames, --builtin, clear, rare, informal, usage, code]
         language: system
         entry: poetry run codespell
         types: [text]
@@ -65,13 +46,14 @@ repos:
         entry: poetry run isort
         types_or: [cython, pyi, python]
         require_serial: true
-      - id: pyupgrade
-        name: Check for old python syntax
-        description: Automatically upgrade syntax for newer versions
-        args: [--py38-plus]
-        language: system
-        entry: poetry run pyupgrade
-        types: [python]
+        # - id: pyupgrade
+        #   name: Check for old python syntax
+        #   description: Automatically upgrade syntax for newer versions
+        #   # NOTE: Remove `--keep-runtime-typing` when https://github.com/tiangolo/typer/issues/533 is fixed.
+        #   args: [--py310-plus, --keep-runtime-typing]
+        #   language: system
+        #   entry: poetry run pyupgrade
+        #   types: [python]
       - id: mypy
         name: Type check python code
         description: Static type checker for Python
