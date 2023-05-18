@@ -66,7 +66,10 @@ from pacup.version import VersionStatuses
 
 __version__ = "1.1.0 Io"
 
-app = typer.Typer(name="pacup")
+app = typer.Typer(
+    name="pacup",
+    context_settings={"help_option_names": ["-h", "--help"]}
+)
 
 
 basicConfig(level="CRITICAL", format="%(message)s", handlers=[RichHandler(markup=True)])
