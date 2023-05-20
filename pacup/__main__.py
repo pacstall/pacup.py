@@ -64,7 +64,7 @@ from pacup.parser import Pacscript
 from pacup.utils import level
 from pacup.version import VersionStatuses
 
-__version__ = "1.1.0 Io"
+__version__ = "2.0.0 Sirius"
 
 app = typer.Typer(
     name="pacup", context_settings={"help_option_names": ["-h", "--help"]}
