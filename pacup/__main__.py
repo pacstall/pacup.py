@@ -37,7 +37,7 @@ from logging import basicConfig, getLogger
 from os import get_terminal_size, makedirs
 from pathlib import Path
 from shutil import rmtree
-from typing import NoReturn, Optional
+from typing import Annotated, NoReturn, Optional
 
 import typer
 from httpx import AsyncClient, HTTPStatusError, RequestError, Response
@@ -67,8 +67,7 @@ from pacup.version import VersionStatuses
 __version__ = "1.1.0 Io"
 
 app = typer.Typer(
-    name="pacup",
-    context_settings={"help_option_names": ["-h", "--help"]}
+    name="pacup", context_settings={"help_option_names": ["-h", "--help"]}
 )
 
 
@@ -273,35 +272,46 @@ def version_callback(value: bool) -> None:
 # HACK: This uses `Optional` due to a typer bug: https://github.com/tiangolo/typer/issues/533
 @app.command()
 def command(
-    show_repology: Optional[bool] = typer.Option(
-        None,
-        "-r",
-        "--show-repology",
-        help="Show the parsed repology data and exit.",
-    ),
-    debug: Optional[bool] = typer.Option(
-        None, "-d", "--debug", help="Turn on debugging mode."
-    ),
-    _: Optional[bool] = typer.Option(
-        None,
-        "-v",
-        "--version",
-        help="Show the version and exit.",
-        callback=version_callback,
-        is_eager=True,
-    ),
-    ship: Optional[bool] = typer.Option(
-        None, "-s", "--ship", help="Prepare the pacscript for shipping to upstream."
-    ),
-    pacscripts: list[Path] = typer.Argument(
-        ...,
-        help="The pacscripts to update.",
-        exists=True,
-        writable=True,
-        dir_okay=False,
-        callback=validate_parameters,
-        autocompletion=autocomplete_command,
-    ),
+    pacscripts: Annotated[
+        list[Path],
+        typer.Argument(
+            show_default=False,
+            exists=True,
+            writable=True,
+            dir_okay=False,
+            callback=validate_parameters,
+            autocompletion=autocomplete_command,
+            help="The pacscripts to update.",
+        ),
+    ],
+    show_repology: Annotated[
+        Optional[bool],
+        typer.Option(
+            "-r",
+            "--show-repology",
+            help="Show the parsed repology data and exit.",
+        ),
+    ] = None,
+    debug: Annotated[
+        Optional[bool],
+        typer.Option("-d", "--debug", help="Turn on debugging mode."),
+    ] = None,
+    _: Annotated[
+        Optional[bool],
+        typer.Option(
+            "-v",
+            "--version",
+            help="Show the version and exit.",
+            callback=version_callback,
+            is_eager=True,
+        ),
+    ] = None,
+    ship: Annotated[
+        Optional[bool],
+        typer.Option(
+            "-s", "--ship", help="Prepare the pacscript for shipping to upstream."
+        ),
+    ] = None,
 ) -> NoReturn:
     """
     Updates specified pacscripts.
