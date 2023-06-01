@@ -14,14 +14,6 @@ repos:
       - id: mixed-line-ending
         args: ["--fix=lf"]
       - id: trailing-whitespace
-  # Misc
-  - repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.5.1
-    hooks:
-      - id: insert-license
-        args: ["--license-filepath=LICENSE_BOILERPLATE", "--detect-license-in-X-top-lines=20"]
-        exclude: '^(.github|.git)'
-        types: [text]
   # Python
   - repo: local
     hooks:
