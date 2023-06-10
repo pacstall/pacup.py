@@ -609,14 +609,14 @@ testing = ["argcomplete", "attrs (>=19.2.0)", "hypothesis (>=3.56)", "mock", "no
 
 [[package]]
 name = "pyupgrade"
-version = "3.4.0"
+version = "3.5.0"
 description = "A tool to automatically upgrade syntax for newer versions."
 category = "dev"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pyupgrade-3.4.0-py2.py3-none-any.whl", hash = "sha256:98b6bee32149f662da1aa038cb9baf93d592ae696059acd613db6ff583583048"},
-    {file = "pyupgrade-3.4.0.tar.gz", hash = "sha256:f6bcf0d5e59170d178a2630e981d0e7b04d9b13f3c0e7e62f3e6bab582f841e4"},
+    {file = "pyupgrade-3.5.0-py2.py3-none-any.whl", hash = "sha256:264bc9a30fa8a40019aa5a03a65ed9dd585a64aa43020aab97df1a58d1411105"},
+    {file = "pyupgrade-3.5.0.tar.gz", hash = "sha256:d76756df4cdd805c908ad07e9ceac3c6696117d8a28b37c8ab4147bc4486076e"},
 ]
 
 [package.dependencies]
