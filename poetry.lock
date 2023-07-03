@@ -574,14 +574,14 @@ hook-testing = ["execnet (>=1.5.0)", "psutil", "pytest (>=2.7.3)"]
 
 [[package]]
 name = "pyinstaller-hooks-contrib"
-version = "2023.3"
+version = "2023.4"
 description = "Community maintained hooks for PyInstaller"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "pyinstaller-hooks-contrib-2023.3.tar.gz", hash = "sha256:bb39e1038e3e0972420455e0b39cd9dce73f3d80acaf4bf2b3615fea766ff370"},
-    {file = "pyinstaller_hooks_contrib-2023.3-py2.py3-none-any.whl", hash = "sha256:062ad7a1746e1cfc24d3a8c4be4e606fced3b123bda7d419f14fcf7507804b07"},
+    {file = "pyinstaller-hooks-contrib-2023.4.tar.gz", hash = "sha256:9c11197653de9605a81975325a60b9369e9cdc37c009b6aeb0221a57211f9388"},
+    {file = "pyinstaller_hooks_contrib-2023.4-py2.py3-none-any.whl", hash = "sha256:fc9892e46fa19d05725205413fb21a764f2f6ff1e70ba95322fb02420a665a45"},
 ]
 
 [[package]]
@@ -624,14 +624,14 @@ tokenize-rt = ">=3.2.0"
 
 [[package]]
 name = "pywin32-ctypes"
-version = "0.2.1"
+version = "0.2.2"
 description = "A (partial) reimplementation of pywin32 using ctypes/cffi"
 category = "dev"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "pywin32-ctypes-0.2.1.tar.gz", hash = "sha256:934a2def1e5cbc472b2b6bf80680c0f03cd87df65dfd58bfd1846969de095b03"},
-    {file = "pywin32_ctypes-0.2.1-py3-none-any.whl", hash = "sha256:b9a53ef754c894a525469933ab2a447c74ec1ea6b9d2ef446f40ec50d3dcec9f"},
+    {file = "pywin32-ctypes-0.2.2.tar.gz", hash = "sha256:3426e063bdd5fd4df74a14fa3cf80a0b42845a87e1d1e81f6549f9daec593a60"},
+    {file = "pywin32_ctypes-0.2.2-py3-none-any.whl", hash = "sha256:bf490a1a709baf35d688fe0ecf980ed4de11d2b3e37b51e5442587a75d9957e7"},
 ]
 
 [[package]]
@@ -780,14 +780,14 @@ test = ["black (>=22.3.0,<23.0.0)", "coverage (>=6.2,<7.0)", "isort (>=5.0.6,<6.
 
 [[package]]
 name = "typing-extensions"
-version = "4.6.3"
+version = "4.7.1"
 description = "Backported and Experimental Type Hints for Python 3.7+"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "typing_extensions-4.6.3-py3-none-any.whl", hash = "sha256:88a4153d8505aabbb4e13aacb7c486c2b4a33ca3b3f807914a9b4c844c471c26"},
-    {file = "typing_extensions-4.6.3.tar.gz", hash = "sha256:d91d5919357fe7f681a9f2b5b4cb2a5f1ef0a1e9f59c4d8ff0d3491e05c0ffd5"},
+    {file = "typing_extensions-4.7.1-py3-none-any.whl", hash = "sha256:440d5dd3af93b060174bf433bccd69b0babc3b15b1a8dca43789fd7f61514b36"},
+    {file = "typing_extensions-4.7.1.tar.gz", hash = "sha256:b75ddc264f0ba5615db7ba217daeb99701ad295353c45f9e95963337ceeeffb2"},
 ]
 
 [[package]]
