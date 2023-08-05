@@ -565,7 +565,7 @@ def command(
             log.info("Editing pacscript file...")
             rprint(f"{padding}[bold blue]=>[/bold blue] Editing pacscript")
             edited_lines = lines.copy()
-            edited_lines[version.line_number] = f'version="{version.latest}"\n'
+            edited_lines[version.line_number] = f'pkgver="{version.latest}"\n'
 
             edited_lines[hash_line] = f'hash="{latest_hash}"\n'
 

@@ -246,17 +246,17 @@ class Pacscript:
                     else extract_var(line, "pkgname=")
                 )
 
-            elif line.startswith("version="):
+            elif line.startswith("pkgver="):
                 log.info(f"Found version: {line}")
                 version = (
                     Version(
                         line_number,
-                        await query_data(pacscript_reader_process, "echo ${version}"),
+                        await query_data(pacscript_reader_process, "echo ${pkgver}"),
                     )
                     if ("$" in line) or ("\\" in line)
                     else Version(
                         line_number,
-                        extract_var(line, "version="),
+                        extract_var(line, "pkgver="),
                     )
                 )
 
@@ -343,4 +343,4 @@ class Pacscript:
         )
 
     def __repr__(self) -> str:
-        return f"Pacscript(name={self.path.name}, pkgname={self.pkgname}, version={self.version}, url={self.url}, hash_line={self.hash_line}, maintainer='{self.maintainer}' repology_filters={self.repology_filters})"
+        return f"Pacscript(name={self.path.name}, pkgname={self.pkgname}, pkgver={self.version}, url={self.url}, hash_line={self.hash_line}, maintainer='{self.maintainer}' repology_filters={self.repology_filters})"
