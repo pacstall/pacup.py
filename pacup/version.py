@@ -41,7 +41,7 @@ from rich.table import Table
 log = getLogger("rich")
 
 # List of repositories not to be used for version detection
-BANNED_REPOS = ['scoop']
+BANNED_REPOS = ['scoop', 'just-install']
 
 
 class VersionStatuses(Enum):
