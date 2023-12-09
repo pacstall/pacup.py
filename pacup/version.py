@@ -41,7 +41,7 @@ from rich.table import Table
 log = getLogger("rich")
 
 # List of repositories not to be used for version detection
-BANNED_REPOS = ['scoop', 'just-install']
+BANNED_REPOS = ["scoop", "just-install"]
 
 
 class VersionStatuses(Enum):
@@ -165,7 +165,9 @@ class Version:
                     if new_filtered := [
                         packages
                         for packages in filtered
-                        if key in packages and packages[key] == value and packages['repo'] not in BANNED_REPOS
+                        if key in packages
+                        and packages[key] == value
+                        and packages["repo"] not in BANNED_REPOS
                     ]:
                         filtered = new_filtered
 
