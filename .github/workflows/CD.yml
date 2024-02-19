@@ -36,7 +36,7 @@ jobs:
           mkdir -p build/
           pyinstaller --name pacup --onefile pacup/__main__.py
       - name: Upload assets
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: github.event_name == 'workflow_dispatch'
         with:
           name: pacup
